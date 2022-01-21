@@ -2,7 +2,7 @@ package frc.robot.subsytems.BallPath.Shooter;
 
 import ca.team3161.lib.robot.subsystem.Subsystem;
 
-public interface ShooterInterface extends Subsystem{
+public interface Shooter extends Subsystem{
     double findTarget();
     void centerTarget(double tx);
     void getDistance(double ty, double angle1, double angle2);

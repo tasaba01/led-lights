@@ -2,7 +2,7 @@ package frc.robot.subsytems.BallPath.Intake;
 
 import ca.team3161.lib.robot.subsystem.Subsystem;
 
-public interface IntakeInterface extends Subsystem{
+public interface Intake extends Subsystem{
     // outer roller will run on extend and stop on retract
     void extendOuter();
     void retractOuter();
