@@ -7,6 +7,7 @@ package frc.robot;
 import ca.team3161.lib.robot.TitanBot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsytems.Drivetrain.Drive;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -21,6 +22,7 @@ public class Robot extends TitanBot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private Drive drivetrain;
 
   @Override
   public int getAutonomousPeriodLengthSeconds() {
@@ -35,6 +37,9 @@ public class Robot extends TitanBot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    // TODO create and pass in motor controllers
+    // this.drivetrain = new DriveImpl();
   }
 
   /**
