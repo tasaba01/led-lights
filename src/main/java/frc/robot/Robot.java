@@ -5,9 +5,12 @@
 package frc.robot;
 
 import ca.team3161.lib.robot.TitanBot;
+import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsytems.Drivetrain.Drive;
+import frc.robot.subsytems.Drivetrain.DriveImpl;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,7 +25,16 @@ public class Robot extends TitanBot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private Drive drivetrain;
+  private PWMSparkMax leftMotorController1; 
+  private PWMSparkMax leftMotorController2; 
+  private SpeedControllerGroup leftSide; 
+
+  private PWMSparkMax rightMotorController1;
+  private PWMSparkMax rightMotorController2;
+  private SpeedControllerGroup rightSide;
+
+
+  Drive drivetrain;
 
   @Override
   public int getAutonomousPeriodLengthSeconds() {
@@ -38,8 +50,17 @@ public class Robot extends TitanBot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    // TODO create and pass in motor controllers
-    // this.drivetrain = new DriveImpl();
+    // create and pass in motor controllers(Done)
+
+    this.leftMotorController1 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0]);
+    this.leftMotorController2 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1]);
+    this.leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
+
+    this.rightMotorController1 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0]);
+    this.rightMotorController2 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1]);
+    this.rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
+
+    this.drivetrain = new DriveImpl(this.leftSide, this.rightSide);
   }
 
   /**
