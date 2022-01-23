@@ -6,6 +6,7 @@ package frc.robot;
 
 import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,15 +26,6 @@ public class Robot extends TitanBot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private PWMSparkMax leftMotorController1; 
-  private PWMSparkMax leftMotorController2; 
-  private SpeedControllerGroup leftSide; 
-
-  private PWMSparkMax rightMotorController1;
-  private PWMSparkMax rightMotorController2;
-  private SpeedControllerGroup rightSide;
-
-
   Drive drivetrain;
 
   @Override
@@ -52,15 +44,17 @@ public class Robot extends TitanBot {
 
     // create and pass in motor controllers(Done)
 
-    this.leftMotorController1 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0]);
-    this.leftMotorController2 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1]);
-    this.leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
+    PWMSparkMax leftMotorController1 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0]);
+    PWMSparkMax leftMotorController2 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1]);
+    SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
 
-    this.rightMotorController1 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0]);
-    this.rightMotorController2 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1]);
-    this.rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
+    PWMSparkMax rightMotorController1 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0]);
+    PWMSparkMax rightMotorController2 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1]);
+    SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
 
-    this.drivetrain = new DriveImpl(this.leftSide, this.rightSide);
+    Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
+    Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
+    this.drivetrain = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
   }
 
   /**
