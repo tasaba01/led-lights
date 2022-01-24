@@ -26,7 +26,7 @@ public class Robot extends TitanBot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  Drive drivetrain;
+  private Drive drivetrain;
 
   @Override
   public int getAutonomousPeriodLengthSeconds() {
