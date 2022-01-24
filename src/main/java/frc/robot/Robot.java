@@ -6,6 +6,7 @@ package frc.robot;
 
 import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
+import ca.team3161.lib.utils.controls.LogitechDualAction;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,6 +28,7 @@ public class Robot extends TitanBot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   private Drive drivetrain;
+  private LogitechDualAction DriverPad;
 
   @Override
   public int getAutonomousPeriodLengthSeconds() {
@@ -41,6 +43,9 @@ public class Robot extends TitanBot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    this.DriverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
+
 
     // create and pass in motor controllers(Done)
 
