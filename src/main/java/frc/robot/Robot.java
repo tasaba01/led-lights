@@ -5,9 +5,13 @@
 package frc.robot;
 
 import ca.team3161.lib.robot.TitanBot;
+import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsytems.Drivetrain.Drive;
+import frc.robot.subsytems.Drivetrain.DriveImpl;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -38,8 +42,19 @@ public class Robot extends TitanBot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    // TODO create and pass in motor controllers
-    // this.drivetrain = new DriveImpl();
+    // create and pass in motor controllers(Done)
+
+    PWMSparkMax leftMotorController1 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0]);
+    PWMSparkMax leftMotorController2 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1]);
+    SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
+
+    PWMSparkMax rightMotorController1 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0]);
+    PWMSparkMax rightMotorController2 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1]);
+    SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
+
+    Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
+    Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
+    this.drivetrain = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
   }
 
   /**
