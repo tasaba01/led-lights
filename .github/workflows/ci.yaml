@@ -17,10 +17,4 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: restore
     - run: ./gradlew --no-daemon clean downloadAll build check test
-    - uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: save
