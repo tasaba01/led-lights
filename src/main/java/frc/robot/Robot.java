@@ -7,12 +7,17 @@ package frc.robot;
 import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
+import ca.team3161.lib.utils.controls.SquaredJoystickMode;
+import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.DriveImpl;
+import frc.robot.subsystems.BallPath.BallPath;
+// import frc.robot.subsystems.BallPath.BallPathImpl;
+import frc.robot.subsystems.Climber.Climber;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,7 +33,9 @@ public class Robot extends TitanBot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   private Drive drivetrain;
-  private LogitechDualAction DriverPad;
+  private LogitechDualAction driverPad;
+  private BallPath ballSubsystem;
+  private Climber climberSubsystem;
 
   @Override
   public int getAutonomousPeriodLengthSeconds() {
@@ -44,7 +51,7 @@ public class Robot extends TitanBot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    this.DriverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
+    this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
 
 
     // create and pass in motor controllers(Done)
@@ -62,7 +69,7 @@ public class Robot extends TitanBot {
     this.drivetrain = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
 
     // Driverpad impl
-    this.DriverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
+    this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
 
 
   }
@@ -112,13 +119,31 @@ public class Robot extends TitanBot {
   @Override
   public void teleopSetup() {
     // TODO Set up bindings
+    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new SquaredJoystickMode());
+    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, new SquaredJoystickMode());
+
+    
+    this.driverPad.bind(ControllerBindings.INTAKE_EXTEND, PressType.PRESS, () -> this.ballSubsystem.extendOuter());
+    this.driverPad.bind(ControllerBindings.INTAKE_RETRACT, PressType.PRESS, () -> this.ballSubsystem.retractOuter());
+    this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverse());
+
+    this.driverPad.bind(ControllerBindings.SPIN_UP, PressType.PRESS, () -> this.ballSubsystem.readyToShoot());
+    this.driverPad.bind(ControllerBindings.SHOOT, PressType.PRESS, () -> this.ballSubsystem.startShooter());
+    this.driverPad.bind(ControllerBindings.SHOOT, PressType.RELEASE, () -> this.ballSubsystem.stopShooter());
+
+
+    this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.climberSubsystem.extendOuterClimber());
+    this.driverPad.bind(ControllerBindings.CLIMBER_RETRACT, PressType.PRESS, () -> this.climberSubsystem.retractOuterClimber());
+    this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
 
   }
+
+  
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    // TODO set up drive (maybe make one for both tank and arcade drive, with one commented out?)
+    this.drivetrain.driveArcade(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
 
   }
 
