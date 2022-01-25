@@ -1,4 +1,4 @@
-package frc.robot.subsytems.BallPath.Elevator;
+package frc.robot.subsystems.BallPath.Elevator;
 
 import ca.team3161.lib.robot.subsystem.Subsystem;
 

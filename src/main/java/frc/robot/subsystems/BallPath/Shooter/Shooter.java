@@ -1,4 +1,4 @@
-package frc.robot.subsytems.BallPath.Shooter;
+package frc.robot.subsystems.BallPath.Shooter;
 
 import ca.team3161.lib.robot.subsystem.Subsystem;
 

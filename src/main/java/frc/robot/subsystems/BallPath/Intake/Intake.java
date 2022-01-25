@@ -1,4 +1,4 @@
-package frc.robot.subsytems.BallPath.Intake;
+package frc.robot.subsystems.BallPath.Intake;
 
 import ca.team3161.lib.robot.subsystem.Subsystem;
 

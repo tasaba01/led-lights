@@ -1,4 +1,4 @@
-package frc.robot.subsytems.Drivetrain;
+package frc.robot.subsystems.Drivetrain;
 
 import java.util.concurrent.TimeUnit;
 

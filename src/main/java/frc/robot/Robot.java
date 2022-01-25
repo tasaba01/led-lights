@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsytems.Drivetrain.Drive;
-import frc.robot.subsytems.Drivetrain.DriveImpl;
+import frc.robot.subsystems.Drivetrain.Drive;
+import frc.robot.subsystems.Drivetrain.DriveImpl;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -60,6 +60,11 @@ public class Robot extends TitanBot {
     Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     this.drivetrain = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
+
+    // Driverpad impl
+    this.DriverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
+
+
   }
 
   /**
@@ -105,11 +110,17 @@ public class Robot extends TitanBot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopSetup() {}
+  public void teleopSetup() {
+    // TODO Set up bindings
+
+  }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopRoutine() {}
+  public void teleopRoutine() {
+    // TODO set up drive (maybe make one for both tank and arcade drive, with one commented out?)
+
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
