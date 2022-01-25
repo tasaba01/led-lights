@@ -20,7 +20,7 @@ jobs:
     - uses: skjolber/maven-cache-github-action@v1
       with:
         step: restore
-    - run: mvn -B -U clean verify
+    - run: ./gradlew --no-daemon clean downloadAll build check test
     - uses: skjolber/maven-cache-github-action@v1
       with:
         step: save
