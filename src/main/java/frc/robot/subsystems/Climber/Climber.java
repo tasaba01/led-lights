@@ -1,4 +1,4 @@
-package frc.robot.subsytems.Climber;
+package frc.robot.subsystems.Climber;
 
 import ca.team3161.lib.robot.subsystem.Subsystem;
 

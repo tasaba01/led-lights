@@ -1,4 +1,4 @@
-package frc.robot.subsytems.Drivetrain;
+package frc.robot.subsystems.Drivetrain;
 
 import ca.team3161.lib.robot.subsystem.Subsystem;
 import edu.wpi.first.wpiutil.math.Pair;
