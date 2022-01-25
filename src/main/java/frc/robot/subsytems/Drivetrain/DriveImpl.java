@@ -20,12 +20,13 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     private final Encoder leftEncoder;
     private final Encoder rightEncoder;
 
-    // PID controller
+    // PID controller values
 
     final double kp = 0;
     final double ki = 0;
     final double kd = 0;
 
+    // PID controllers
     
     private final PIDController leftPIDController;
     private final PIDController rightPIDController;
