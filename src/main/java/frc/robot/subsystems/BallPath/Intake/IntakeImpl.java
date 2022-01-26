@@ -1,20 +1,28 @@
 package frc.robot.subsystems.BallPath.Intake;
 
 import java.util.concurrent.TimeUnit;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
-public class IntakeImpl extends RepeatingPooledSubsystem implements Intake{
-    
-    private WPI_TalonSRX frontIntake;
-    private WPI_TalonSRX backIntake;
-    private boolean frontRunning;
-    private boolean backRunning;
+// import com.revrobotics.ColorSensorV3;
+// import com.revrobotics.ColorMatchResult;
+// import com.revrobotics.ColorMatch;
 
-    public IntakeImpl(WPI_TalonSRX frontintake, WPI_TalonSRX backIntake) {
+public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
+
+    private final WPI_TalonSRX intake;
+    private boolean primed;
+    private int speed = 1;
+
+    public IntakeImpl(WPI_TalonSRX intake) {
         super(20, TimeUnit.MILLISECONDS);
-        this.frontIntake = frontIntake;
-        this.backIntake = backIntake;
+        this.intake = intake;
+    }
+
+    @Override
+    public void defineResources() {
+        require(intake);
     }
 
     @Override
@@ -23,33 +31,56 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake{
     }
 
     @Override
-    public void defineResources() {
-        require(frontIntake);
-        require(backIntake);
+    public void start(){
+        this.intake.set(this.speed);
     }
 
+    @Override
+    public void reverse(){
+        this.intake.set(-this.speed);
+    }
+
+    @Override
+    public void stop(){
+        this.intake.set(0);
+    }
+
+
+    // checks if ball is at bottom of elevator
+    @Override
+    public boolean checkIfPrimed(){
+        // if (ballUnderElevator){
+        //     this.primed = true;
+        // }
+
+        return this.primed;
+    }
+    
+    @Override
     public boolean checkColour(){
         return true;
     }
-    // checks if ball is held by intake
-    public boolean checkBall(){
-        return true;
-    }
-    public void reverse(){
 
-    }
-    // checks if ball is at bottom of elevator
-    public boolean checkIfPrime(){
-        return true;
-    }
     // primes a ball
-    public void runInnerleft(){
+    // @Override
+    // public void runInner(int side){
+    //     // side: 0 = front
+    //     // side: 1 = back
+    //     if (side == 0){
+    //         this.frontIntake.set(1);
+    //     } else if (side == 1){
+    //         this.backIntake.set(1);
+    //     }
+    // }
 
-    }
-    public void runInnerRight(){
-
-    }
-    public void stopInner(){
-        
-    }
+    // @Override
+    // public void stopInner(int side){
+    //     // side: 0 = front
+    //     // side: 1 = back
+    //     if (side == 0){
+    //         this.frontIntake.set(0);
+    //     } else if (side == 1){
+    //         this.backIntake.set(0);
+    //     }
+    // }
 }

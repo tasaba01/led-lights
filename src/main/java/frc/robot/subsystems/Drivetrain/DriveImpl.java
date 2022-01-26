@@ -2,6 +2,7 @@ package frc.robot.subsystems.Drivetrain;
 
 import java.util.concurrent.TimeUnit;
 
+import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import edu.wpi.first.wpilibj.Encoder;
@@ -97,7 +98,8 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         // TODO Set setpoints for encoders
         
     }
-
-
+    
+    @Override
+    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {}
 
 }
