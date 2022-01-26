@@ -16,8 +16,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.DriveImpl;
 import frc.robot.subsystems.BallPath.BallPath;
+import frc.robot.subsystems.BallPath.BallPathImpl;
 // import frc.robot.subsystems.BallPath.BallPathImpl;
 import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.ClimberImpl;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -32,7 +34,7 @@ public class Robot extends TitanBot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private Drive drivetrain;
+  private Drive drive;
   private LogitechDualAction driverPad;
   private BallPath ballSubsystem;
   private Climber climberSubsystem;
@@ -66,12 +68,17 @@ public class Robot extends TitanBot {
 
     Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
-    this.drivetrain = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
+    this.drive = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
 
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
+    this.ballSubsystem = new BallPathImpl();
+    this.climberSubsystem = new ClimberImpl();
 
-
+    // register lifecycle components
+    registerLifecycleComponent(driverPad);
+    registerLifecycleComponent(drive);
+    registerLifecycleComponent(ballSubsystem);
   }
 
   /**
@@ -143,7 +150,7 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    this.drivetrain.driveArcade(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
+    this.drive.driveArcade(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
 
   }
 

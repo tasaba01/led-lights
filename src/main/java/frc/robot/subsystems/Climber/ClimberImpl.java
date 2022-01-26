@@ -6,21 +6,16 @@ package frc.robot.subsystems.Climber;
 // import frc.robot.RobotMap;
 
 public class ClimberImpl implements Climber {
+    @Override
+    public void extendOuterClimber(){}
 
-    public void extendOuterClimber(){
+    @Override
+    public void retractOuterClimber(){}
 
-    };
+    @Override
+    public void angleOuter(double angle){}
 
-    public void retractOuterClimber(){
-
-    };
-
-    public void angleOuter(double angle){
-
-    };
-
-    public void attachInner(){
-
-    };
+    @Override
+    public void attachInner(){}
 
 }

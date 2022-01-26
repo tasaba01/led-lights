@@ -1,13 +1,33 @@
 package frc.robot.subsystems.BallPath.Elevator;
 
-public class ElevatorImpl {
+import java.util.concurrent.TimeUnit;
+
+import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
+
+public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
+    public ElevatorImpl() {
+        super(10, TimeUnit.MILLISECONDS);
+    }
+
     // temporary, will be changed to something better
+    @Override
     public int[] checkBalls(){
         int[] arr = {};
         return arr;
-    };
-    public void startElevator(){};
-    public void stopElevator(){};
+    }
+
+    @Override
+    public void startElevator(){}
+
+    @Override
+    public void stopElevator(){}
     // can be used to stop a ball from going up the elevator in the event that we cannot shoot the ball
-    public void reverseElevator(){};
+
+    @Override
+    public void reverseElevator(){}
+
+    @Override
+    public void defineResources() {}
+
+    public void task(){}
 }
