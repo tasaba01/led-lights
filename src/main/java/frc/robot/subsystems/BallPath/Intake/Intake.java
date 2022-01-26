@@ -4,8 +4,8 @@ import ca.team3161.lib.robot.subsystem.Subsystem;
 
 public interface Intake extends Subsystem{
     // outer roller will run on extend and stop on retract
-    void extendOuter();
-    void retractOuter();
+    // void extendOuter();
+    // void retractOuter();
     // checks colour of ball
     boolean checkColour();
     // checks if ball is held by intake
