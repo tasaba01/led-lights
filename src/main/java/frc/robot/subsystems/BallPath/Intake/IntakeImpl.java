@@ -7,7 +7,7 @@ import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
 public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     public IntakeImpl() {
-        super(10, TimeUnit.MILLISECONDS);
+        super(20, TimeUnit.MILLISECONDS);
         // TODO Auto-generated constructor stub
     }
 

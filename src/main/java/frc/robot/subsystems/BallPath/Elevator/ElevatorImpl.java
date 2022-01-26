@@ -6,7 +6,7 @@ import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     public ElevatorImpl() {
-        super(10, TimeUnit.MILLISECONDS);
+        super(20, TimeUnit.MILLISECONDS);
     }
 
     // temporary, will be changed to something better

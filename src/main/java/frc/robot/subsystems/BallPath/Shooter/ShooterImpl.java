@@ -7,7 +7,7 @@ import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
 public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     public ShooterImpl() {
-        super(20, TimeUnit.MILLISECONDS);
+        super(10, TimeUnit.MILLISECONDS);
         // TODO Auto-generated constructor stub
     }
 
