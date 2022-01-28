@@ -26,13 +26,19 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
     // Declare interface with team
     @Override
-    public void extendOuter(){}
-    
-    @Override
-    public void retractOuter(){}
+    public void startIntake(){
+
+    }
 
     @Override
-    public void reverse(){}
+    public void reverseIntake(){
+
+    }
+
+    @Override
+    public void stopIntake(){
+
+    }
     
     // checks if ball is at bottom of elevator, checks sensors and primes
     @Override

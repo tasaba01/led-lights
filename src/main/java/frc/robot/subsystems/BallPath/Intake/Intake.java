@@ -1,7 +1,6 @@
 package frc.robot.subsystems.BallPath.Intake;
 
 import ca.team3161.lib.robot.subsystem.Subsystem;
-// import com.revrobotics.ColorSensorV3;
 
 
 public interface Intake extends Subsystem{
@@ -10,6 +9,7 @@ public interface Intake extends Subsystem{
     void reverse();
     void stop();
 
+    boolean checkIntake();
     boolean checkColour();
     // checks if ball is at bottom of elevator
     boolean checkIfPrimed();
