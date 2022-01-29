@@ -14,13 +14,6 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
         this.elevatorSensor = elevatorSensor;
     }
 
-    // temporary, will be changed to something better
-    @Override
-    public int[] checkBalls(){
-        int[] arr = {};
-        return arr;
-    }
-
     @Override
     public void start(){}
 
