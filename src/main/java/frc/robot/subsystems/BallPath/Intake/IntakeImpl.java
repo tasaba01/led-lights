@@ -10,28 +10,41 @@ import com.revrobotics.ColorSensorV3;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorMatch;
 
+import edu.wpi.first.wpilibj.Ultrasonic;
+
 public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
 
     private final WPI_TalonSRX intake;
-    private boolean primed;
     private int speed = 1;
+
+
     private ColorSensorV3 leftColorSensor;
     private ColorSensorV3 rightColorSensor;
     private final ColorMatch colorMatcher = new ColorMatch();
-    private Color leftDetected;
-    private Color rightDetected;
     private final Color target = new Color(1, 1, 1);
+    
+    private final Ultrasonic intakeSensor;
+    private final Ultrasonic elevatorSensor;
 
 
-    public IntakeImpl(WPI_TalonSRX intake, ColorSensorV3 leftColorSensor, ColorSensorV3 rightColorSensor) {
+
+    public IntakeImpl(WPI_TalonSRX intake, ColorSensorV3 leftColorSensor, ColorSensorV3 rightColorSensor, Ultrasonic intakeSensor, Ultrasonic elevatorSensor) {
         super(20, TimeUnit.MILLISECONDS);
         this.intake = intake;
+        this.leftColorSensor = leftColorSensor;
+        this.rightColorSensor = rightColorSensor;
         this.colorMatcher.addColorMatch(this.target);
+        this.intakeSensor = intakeSensor;
+        this.elevatorSensor = elevatorSensor;
     }
 
     @Override
     public void defineResources() {
         require(intake);
+        require(intakeSensor);
+        require(elevatorSensor);
+        require(leftColorSensor);
+        require(rightColorSensor);
     }
 
     @Override
@@ -42,7 +55,6 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     @Override
     public void start(){
         this.intake.set(this.speed);
-        this.checkIntake();
     }
 
     @Override
@@ -54,58 +66,37 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     public void stop(){
         this.intake.set(0);
     }
-
-
-    // checks if ball is at bottom of elevator
-    @Override
-    public boolean checkIfPrimed(){
-        // if (ballUnderElevator){
-        //     this.primed = true;
-        // }
-
-        return this.primed;
-    }
     
     @Override
     public boolean checkColour(){
-        this.leftDetected = this.leftColorSensor.getColor();
-        this.rightDetected = this.rightColorSensor.getColor();
+        Color leftDetected = this.leftColorSensor.getColor();
+        Color rightDetected = this.rightColorSensor.getColor();
         ColorMatchResult leftResult = this.colorMatcher.matchColor(leftDetected);
         ColorMatchResult rightResult = this.colorMatcher.matchColor(rightDetected);
 
+        // if we are red team
         if (leftResult.color == this.target || rightResult.color == this.target){
+            // if team ball
             return true;
         } 
 
         return false;
+
+        // if we are blue team
+        // if (leftResult.color == this.target || rightResult.color == this.target){
+        //     // if team ball
+        //     return false;
+        // } 
+
+        // return true;
     }
 
     @Override
     public boolean checkIntake(){
-        // Calls check color
-        return true;
+        if (this.intakeSensor.getRangeInches() <= 10){
+            return true;
+        }
+
+        return false;
     }
-
-    // primes a ball
-    // @Override
-    // public void runInner(int side){
-    //     // side: 0 = front
-    //     // side: 1 = back
-    //     if (side == 0){
-    //         this.frontIntake.set(1);
-    //     } else if (side == 1){
-    //         this.backIntake.set(1);
-    //     }
-    // }
-
-    // @Override
-    // public void stopInner(int side){
-    //     // side: 0 = front
-    //     // side: 1 = back
-    //     if (side == 0){
-    //         this.frontIntake.set(0);
-    //     } else if (side == 1){
-    //         this.backIntake.set(0);
-    //     }
-    // }
 }

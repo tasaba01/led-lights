@@ -4,9 +4,14 @@ import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
+import edu.wpi.first.wpilibj.Ultrasonic;
+
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
-    public ElevatorImpl() {
+    public final Ultrasonic elevatorSensor;
+
+    public ElevatorImpl(Ultrasonic elevatorSensor) {
         super(20, TimeUnit.MILLISECONDS);
+        this.elevatorSensor = elevatorSensor;
     }
 
     // temporary, will be changed to something better
@@ -17,14 +22,14 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     }
 
     @Override
-    public void startElevator(){}
+    public void start(){}
 
     @Override
-    public void stopElevator(){}
+    public void reverse(){}
+
+    @Override
+    public void stop(){}
     // can be used to stop a ball from going up the elevator in the event that we cannot shoot the ball
-
-    @Override
-    public void reverseElevator(){}
 
     @Override
     public void defineResources() {}

@@ -11,7 +11,5 @@ public interface Intake extends Subsystem{
 
     boolean checkIntake();
     boolean checkColour();
-    // checks if ball is at bottom of elevator
-    boolean checkIfPrimed();
     // Assuming current design of 2 to 3 rollers in the robot.
 }

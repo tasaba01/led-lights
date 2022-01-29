@@ -35,10 +35,10 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     public void setHoodAngle(double distance){}
 
     @Override
-    public void startShooter(){}
+    public void start(){}
 
     @Override
-    public void stopShooter(){}
+    public void stop(){}
 
     @Override
     public void defineResources(){}
