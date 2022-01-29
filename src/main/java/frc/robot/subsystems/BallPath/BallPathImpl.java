@@ -31,7 +31,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
     @Override
     public void task() throws InterruptedException{
-        if (this.action == "START_INTAKE"){
+        if (this.action.equals("START_INTAKE")){
             if (this.intake.checkIntake()){
                 this.intake.stop();
             }
