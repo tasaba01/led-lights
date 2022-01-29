@@ -4,14 +4,14 @@ import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
-import edu.wpi.first.wpilibj.Ultrasonic;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
-    public final Ultrasonic elevatorSensor;
+    public final WPI_TalonSRX elevator;
 
-    public ElevatorImpl(Ultrasonic elevatorSensor) {
+    public ElevatorImpl(WPI_TalonSRX elevator) {
         super(20, TimeUnit.MILLISECONDS);
-        this.elevatorSensor = elevatorSensor;
+        this.elevator = elevator;
     }
 
     @Override

@@ -24,25 +24,21 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     private final Color target = new Color(1, 1, 1);
     
     private final Ultrasonic intakeSensor;
-    private final Ultrasonic elevatorSensor;
 
 
-
-    public IntakeImpl(WPI_TalonSRX intake, ColorSensorV3 leftColorSensor, ColorSensorV3 rightColorSensor, Ultrasonic intakeSensor, Ultrasonic elevatorSensor) {
+    public IntakeImpl(WPI_TalonSRX intake, ColorSensorV3 leftColorSensor, ColorSensorV3 rightColorSensor, Ultrasonic intakeSensor) {
         super(20, TimeUnit.MILLISECONDS);
         this.intake = intake;
         this.leftColorSensor = leftColorSensor;
         this.rightColorSensor = rightColorSensor;
         this.colorMatcher.addColorMatch(this.target);
         this.intakeSensor = intakeSensor;
-        this.elevatorSensor = elevatorSensor;
     }
 
     @Override
     public void defineResources() {
         require(intake);
         require(intakeSensor);
-        require(elevatorSensor);
         require(leftColorSensor);
         require(rightColorSensor);
     }

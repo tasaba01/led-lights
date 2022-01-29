@@ -5,53 +5,49 @@ import java.util.concurrent.TimeUnit;
 import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
-// import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
-// import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
-
-// import java.util.concurrent.TimeUnit;
-
-// import ca.team3161.lib.robot.LifecycleEvent;
-// import frc.robot.subsystems.BallPath.Intake.Intake;
-import frc.robot.subsystems.BallPath.Intake.IntakeImpl;
-// import frc.robot.subsystems.BallPath.Elevator.Elevator;
-import frc.robot.subsystems.BallPath.Elevator.ElevatorImpl;
-// import frc.robot.subsystems.BallPath.Shooter.Shooter;
-import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
-
+import frc.robot.subsystems.BallPath.Intake.Intake;
+import frc.robot.subsystems.BallPath.Elevator.Elevator;
+import frc.robot.subsystems.BallPath.Shooter.Shooter;
 import edu.wpi.first.wpilibj.Ultrasonic;
 
 public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
-    private final IntakeImpl intake;
-    private final ElevatorImpl elevator;
+    private final Intake intake;
+    private final Elevator elevator;
     private final Ultrasonic elevatorSensor;
-    private final ShooterImpl shooter;
+    private final Shooter shooter;
+    private String action;
 
-    public BallPathImpl(IntakeImpl intake, ElevatorImpl elevator, Ultrasonic elevatorSensor, ShooterImpl shooter) {
+    public BallPathImpl(Intake intake, Elevator elevator, Shooter shooter, Ultrasonic elevatorSensor) {
         super(20, TimeUnit.MILLISECONDS);
-        // TODO Auto-generated constructor stub
         this.intake = intake;
         this.elevator = elevator;
         this.elevatorSensor = elevatorSensor;
         this.shooter = shooter;
     }
 
+    @Override
+    public void defineResources(){}
+
+    @Override
+    public void task() throws InterruptedException{
+        if (this.action == "START_INTAKE"){
+            if (this.intake.checkIntake()){
+                this.intake.stop();
+            }
+            if (this.intake.checkColour() && !this.checkIfPrimed()){
+                this.intake.start();
+                Thread.sleep(3000);
+                this.intake.stop();
+            }
+        }
+    }
+
     // Declare interface with team
     @Override
     public void startIntake(){
         this.intake.start();
-        if (this.intake.checkIntake()){
-            this.intake.stop();
-        }
-        if (this.intake.checkColour() && !this.checkIfPrimed()){
-            this.intake.start();
-        }
-        try {
-            Thread.sleep(3000);
-        } catch(InterruptedException e){
-            // do nothing
-        }
-        this.intake.stop();
+        this.action = "START_INTAKE";
     }
 
     @Override
@@ -110,11 +106,6 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
     public void stopShooter(){
         this.shooter.stop();
     }
-
-    @Override
-    public void defineResources(){}
-
-    public void task(){}
         
     @Override
     public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {}

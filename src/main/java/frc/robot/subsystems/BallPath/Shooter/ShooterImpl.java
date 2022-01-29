@@ -12,6 +12,12 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     }
 
     @Override
+    public void defineResources(){}
+
+    @Override
+    public void task(){}
+
+    @Override
     public void findAndCenterTarget() {}
 
     @Override
@@ -39,10 +45,4 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
 
     @Override
     public void stop(){}
-
-    @Override
-    public void defineResources(){}
-
-    public void task(){}
-    
 }
