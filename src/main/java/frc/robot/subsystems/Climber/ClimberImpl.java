@@ -1,13 +1,16 @@
 package frc.robot.subsystems.Climber;
 
 import java.lang.Thread;
+import java.util.concurrent.TimeUnit;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import frc.robot.RobotMap;
 
 public class ClimberImpl implements Climber {
-        
+     
+    private long starttime = 0;
+
     WPI_TalonSRX lifterMotorController;
     DoubleSolenoid climberSolenoid;
 
@@ -18,39 +21,24 @@ public class ClimberImpl implements Climber {
 
     @Override
     public void extendOuterClimber() {
-        try {
-            this.lifterMotorController.set(1); // test value
-            Thread.sleep(5000);
-            this.lifterMotorController.set(0);
-        } 
-        catch(Exception e) { 
-            System.out.println(e.getMessage());
-        }
+        long now = System.nanoTime();
+        if(this.starttime < 0) this.starttime = now;
+        this.lifterMotorController.set(1); // test value
+        if(now > this.starttime + TimeUnit.SECONDS.toNanos(5)) this.lifterMotorController.set(0);
     }
 
     @Override
     public void retractOuterClimber() {
-        try {
-            this.lifterMotorController.set(1); // test value
-            Thread.sleep(5000);
-            this.lifterMotorController.set(0);
-        } 
-        catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
+        long now = System.nanoTime();
+        if(this.starttime < 0) this.starttime = now;
+        this.lifterMotorController.set(1); // test value
+        if(now > this.starttime + TimeUnit.SECONDS.toNanos(5)) this.lifterMotorController.set(0);
     }
 
     @Override
     public void angleOuter(double angle) {}
 
     @Override
-    public void attachInner() {
-        try {
-            Thread.sleep(650);
-        } 
-        catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+    public void attachInner() {}
 
 }
