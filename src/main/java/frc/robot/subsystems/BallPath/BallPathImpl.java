@@ -18,6 +18,8 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
     private final Shooter shooter;
     private String action;
 
+    private long intakeStartedTime = -1;
+
     public BallPathImpl(Intake intake, Elevator elevator, Shooter shooter, Ultrasonic elevatorSensor) {
         super(20, TimeUnit.MILLISECONDS);
         this.intake = intake;
@@ -32,13 +34,19 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
     @Override
     public void task() throws InterruptedException{
         if (this.action.equals("START_INTAKE")){
-            if (this.intake.checkIntake()){
-                this.intake.stop();
-            }
-            if (this.intake.checkColour() && !this.checkIfPrimed()){
-                this.intake.start();
-                Thread.sleep(3000);
-                this.intake.stop();
+            if (this.intake.checkColour() && !this.checkIfPrimed()){ 
+                long now = System.nanoTime(); // current unix timestamp in nanoseconds 
+                if (this.intakeStartedTime < 0) { 
+                    this.intakeStartedTime = now; 
+                } 
+                this.intake.start(); 
+                if (now > this.intakeStartedTime + TimeUnit.SECONDS.toNanos(3)) { 
+                    this.intake.stop(); 
+                    this.intakeStartedTime = -1; 
+                    // we have completed this action and don't want to repeat it all over again, 
+                    // so maybe we do this too: 
+                    this.action = "IDLE"; 
+                } 
             }
         }
     }
