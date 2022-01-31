@@ -5,13 +5,14 @@ import ca.team3161.lib.robot.subsystem.Subsystem;
 
 public interface BallPath extends Subsystem, LifecycleListener {
     // Declare interface with team
-    void extendOuter();
-    void retractOuter();
-    void reverse();
-    // checks if ball is at bottom of elevator, checks sensors and primes
-    boolean checkIfPrime();
+    void startIntake();
+    void reverseIntake();
+    void stopIntake();
+    boolean checkIfPrimed();
     // can be used to stop a ball from going up the elevator in the event that we cannot shoot the ball
+    void startElevator();
     void reverseElevator();
+    void stopElevator();
     void findAndCenterTarget();
     boolean readyToShoot();
     void startShooter();

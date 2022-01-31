@@ -10,17 +10,26 @@ import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.SquaredJoystickMode;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMSparkMax;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.DriveImpl;
 import frc.robot.subsystems.BallPath.BallPath;
 import frc.robot.subsystems.BallPath.BallPathImpl;
-// import frc.robot.subsystems.BallPath.BallPathImpl;
+import frc.robot.subsystems.BallPath.Elevator.Elevator;
+import frc.robot.subsystems.BallPath.Elevator.ElevatorImpl;
+import frc.robot.subsystems.BallPath.Intake.Intake;
+import frc.robot.subsystems.BallPath.Intake.IntakeImpl;
+import frc.robot.subsystems.BallPath.Shooter.Shooter;
+import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberImpl;
 
+// Intake Imports
+import com.revrobotics.ColorSensorV3;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.Ultrasonic;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -53,11 +62,7 @@ public class Robot extends TitanBot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
-
-
-    // create and pass in motor controllers(Done)
-
+    // DRIVETRAIN COMPONENTS
     PWMSparkMax leftMotorController1 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0]);
     PWMSparkMax leftMotorController2 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1]);
     SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
@@ -70,9 +75,26 @@ public class Robot extends TitanBot {
     Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     this.drive = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
 
+    // INTAKE COMPONENTS
+    WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
+    ColorSensorV3 leftColorSensor = new ColorSensorV3(RobotMap.LEFT_COLOR_SENSOR_PORT);
+    ColorSensorV3 rightColorSensor = new ColorSensorV3(RobotMap.RIGHT_COLOR_SENSOR_PORT);
+    Ultrasonic intakeSensor = new Ultrasonic(RobotMap.INTAKE_ULTRASONIC_PORTS[0], RobotMap.INTAKE_ULTRASONIC_PORTS[1]);
+    Intake intake = new IntakeImpl(intakeMotorController, leftColorSensor, rightColorSensor, intakeSensor);
+    
+    // ELEVATOR COMPONENTS
+    WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
+    Elevator elevator = new ElevatorImpl(elevatorMotorController);
+
+    // SHOOTER COMPONENTS
+    Shooter shooter = new ShooterImpl();
+
+    // ELEVATOR SENSOR
+    Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
+    
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
-    this.ballSubsystem = new BallPathImpl();
+    this.ballSubsystem = new BallPathImpl(intake, elevator, shooter, elevatorSensor);
     this.climberSubsystem = new ClimberImpl();
 
     // register lifecycle components
@@ -130,9 +152,9 @@ public class Robot extends TitanBot {
     this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, new SquaredJoystickMode());
 
     
-    this.driverPad.bind(ControllerBindings.INTAKE_EXTEND, PressType.PRESS, () -> this.ballSubsystem.extendOuter());
-    this.driverPad.bind(ControllerBindings.INTAKE_RETRACT, PressType.PRESS, () -> this.ballSubsystem.retractOuter());
-    this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverse());
+    this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
+    this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
+    this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
 
     this.driverPad.bind(ControllerBindings.SPIN_UP, PressType.PRESS, () -> this.ballSubsystem.readyToShoot());
     this.driverPad.bind(ControllerBindings.SHOOT, PressType.PRESS, () -> this.ballSubsystem.startShooter());

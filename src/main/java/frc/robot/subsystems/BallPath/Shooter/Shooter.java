@@ -10,6 +10,6 @@ public interface Shooter extends Subsystem{
     boolean readyToShoot();
     int checkBalls();
     void setHoodAngle(double distance);
-    void startShooter();
-    void stopShooter();
+    void start();
+    void stop();
 }

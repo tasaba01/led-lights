@@ -4,27 +4,25 @@ import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
-    public ElevatorImpl() {
+    public final WPI_TalonSRX elevator;
+
+    public ElevatorImpl(WPI_TalonSRX elevator) {
         super(20, TimeUnit.MILLISECONDS);
-    }
-
-    // temporary, will be changed to something better
-    @Override
-    public int[] checkBalls(){
-        int[] arr = {};
-        return arr;
+        this.elevator = elevator;
     }
 
     @Override
-    public void startElevator(){}
+    public void start(){}
 
     @Override
-    public void stopElevator(){}
+    public void reverse(){}
+
+    @Override
+    public void stop(){}
     // can be used to stop a ball from going up the elevator in the event that we cannot shoot the ball
-
-    @Override
-    public void reverseElevator(){}
 
     @Override
     public void defineResources() {}

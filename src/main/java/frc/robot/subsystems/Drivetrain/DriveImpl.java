@@ -6,9 +6,9 @@ import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpiutil.math.Pair;
+import edu.wpi.first.math.Pair;
 
 public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     

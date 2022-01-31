@@ -12,6 +12,12 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     }
 
     @Override
+    public void defineResources(){}
+
+    @Override
+    public void task(){}
+
+    @Override
     public void findAndCenterTarget() {}
 
     @Override
@@ -35,14 +41,8 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     public void setHoodAngle(double distance){}
 
     @Override
-    public void startShooter(){}
+    public void start(){}
 
     @Override
-    public void stopShooter(){}
-
-    @Override
-    public void defineResources(){}
-
-    public void task(){}
-    
+    public void stop(){}
 }
