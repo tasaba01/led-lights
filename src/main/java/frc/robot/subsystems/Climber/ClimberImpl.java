@@ -12,11 +12,11 @@ public class ClimberImpl implements Climber {
     private long starttime = 0;
 
     WPI_TalonSRX lifterMotorController;
-    DoubleSolenoid climberSolenoid;
+    //DoubleSolenoid climberSolenoid;
 
     public ClimberImpl() {
         this.lifterMotorController = new WPI_TalonSRX(RobotMap.LIFTER_TALON_PORT);
-        this.climberSolenoid = new DoubleSolenoid(RobotMap.CLIMBER_SOLENOID_CHANNELS[0], RobotMap.CLIMBER_SOLENOID_CHANNELS[1]);
+        //this.climberSolenoid = new DoubleSolenoid(RobotMap.CLIMBER_SOLENOID_CHANNELS[0], RobotMap.CLIMBER_SOLENOID_CHANNELS[1]);
     }
 
     @Override
