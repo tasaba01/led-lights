@@ -45,7 +45,6 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
 
     @Override
     public void task() throws Exception {
-        // TODO Auto-generated method stub
     }
 
     @Override

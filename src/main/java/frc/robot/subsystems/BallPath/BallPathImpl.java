@@ -26,6 +26,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
         this.elevator = elevator;
         this.elevatorSensor = elevatorSensor;
         this.shooter = shooter;
+        this.action = "IDLE";
     }
 
     @Override
