@@ -32,7 +32,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
     public void defineResources(){}
 
     @Override
-    public void task() throws InterruptedException{
+    public void task(){
         if (this.action.equals("START_INTAKE")){
             if (this.intake.checkColour() && !this.checkIfPrimed()){ 
                 long now = System.nanoTime(); // current unix timestamp in nanoseconds 
