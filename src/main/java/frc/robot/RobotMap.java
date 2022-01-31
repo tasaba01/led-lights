@@ -25,4 +25,8 @@ public final class RobotMap {
 
     public static final int ELEVATOR_TALON_PORT = 0;
 
+    // Climber
+    public static final int LIFTER_TALON_PORT = 0;
+    public static final int[] CLIMBER_SOLENOID_CHANNELS = {0,0};
+
 }
