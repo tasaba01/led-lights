@@ -9,8 +9,8 @@ import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.SquaredJoystickMode;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+// import edu.wpi.first.wpilibj.Encoder;
+// import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain.Drive;
@@ -26,8 +26,11 @@ import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberImpl;
 
+import com.revrobotics.CANSparkMax;
 // Intake Imports
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Ultrasonic;
 /**
@@ -47,6 +50,7 @@ public class Robot extends TitanBot {
   private LogitechDualAction driverPad;
   private BallPath ballSubsystem;
   private Climber climberSubsystem;
+  // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
 
   @Override
   public int getAutonomousPeriodLengthSeconds() {
@@ -63,17 +67,22 @@ public class Robot extends TitanBot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     // DRIVETRAIN COMPONENTS
-    PWMSparkMax leftMotorController1 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0]);
-    PWMSparkMax leftMotorController2 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1]);
+    CANSparkMax leftMotorController1 = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0], MotorType.kBrushless);
+    CANSparkMax leftMotorController2 = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1], MotorType.kBrushless);
     SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
 
-    PWMSparkMax rightMotorController1 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0]);
-    PWMSparkMax rightMotorController2 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1]);
+    CANSparkMax rightMotorController1 = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0], MotorType.kBrushless);
+    CANSparkMax rightMotorController2 = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1], MotorType.kBrushless);
     SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
 
-    Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
-    Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
-    this.drive = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
+    // Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
+    // Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
+    RelativeEncoder leftEncoder1 = leftMotorController1.getEncoder();
+    RelativeEncoder leftEncoder2 = leftMotorController2.getEncoder();
+    RelativeEncoder rightEncoder1 = rightMotorController1.getEncoder();
+    RelativeEncoder rightEncoder2 = rightMotorController2.getEncoder();
+
+    this.drive = new DriveImpl(leftSide, rightSide, leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2);
 
     // INTAKE COMPONENTS
     WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
