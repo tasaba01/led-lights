@@ -26,11 +26,17 @@ import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberImpl;
 
+// Spark Max Imports (Drive Train)
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+
 // Intake Imports
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Controller;
@@ -71,13 +77,22 @@ public class Robot extends TitanBot {
     // DRIVETRAIN COMPONENTS
     CANSparkMax leftMotorController1 = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0], MotorType.kBrushless);
     CANSparkMax leftMotorController2 = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1], MotorType.kBrushless);
-    SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
-
     CANSparkMax rightMotorController1 = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0], MotorType.kBrushless);
-    rightMotorController1.setInverted(true);
     CANSparkMax rightMotorController2 = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1], MotorType.kBrushless);
+    
+
+    
+    leftMotorController1.restoreFactoryDefaults();
+    leftMotorController2.restoreFactoryDefaults();
+    rightMotorController1.restoreFactoryDefaults();
+    rightMotorController2.restoreFactoryDefaults();
+    
+    rightMotorController1.setInverted(true);
     rightMotorController2.setInverted(true);
+    
+    SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
     SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
+    
     // rightSide.setInverted(true);
     // Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     // Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
