@@ -10,6 +10,7 @@ import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 // import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.Pair;
 
 public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
@@ -81,8 +82,10 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         this.drivetrain.arcadeDrive(speed, rotation);
     }
 
-    public void DrivePid(){
+    public void drivePidTank(){
         this.drivetrain.tankDrive(this.leftPIDController.calculate(this.leftEncoder1.getVelocity()), this.rightPIDController.calculate(this.rightEncoder1.getVelocity()));
+        SmartDashboard.putNumber("left encoder velocity", this.leftEncoder1.getVelocity());
+        SmartDashboard.putNumber("Right Encoder Velocity", this.rightEncoder1.getVelocity());
     }
 
     @Override
@@ -105,7 +108,8 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     }
 
     public void setSetpoint(double setpoint){
-        // TODO Set setpoints for encoders
+        this.leftPIDController.setSetpoint(setpoint);
+        this.rightPIDController.setSetpoint(setpoint);
         
     }
     

@@ -32,6 +32,8 @@ import com.revrobotics.ColorSensorV3;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.Controller;
 import edu.wpi.first.wpilibj.Ultrasonic;
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -72,9 +74,11 @@ public class Robot extends TitanBot {
     SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
 
     CANSparkMax rightMotorController1 = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0], MotorType.kBrushless);
+    rightMotorController1.setInverted(true);
     CANSparkMax rightMotorController2 = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1], MotorType.kBrushless);
+    rightMotorController2.setInverted(true);
     SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
-
+    // rightSide.setInverted(true);
     // Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     // Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     RelativeEncoder leftEncoder1 = leftMotorController1.getEncoder();
@@ -85,31 +89,31 @@ public class Robot extends TitanBot {
     this.drive = new DriveImpl(leftSide, rightSide, leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2);
 
     // INTAKE COMPONENTS
-    WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
-    ColorSensorV3 leftColorSensor = new ColorSensorV3(RobotMap.LEFT_COLOR_SENSOR_PORT);
-    ColorSensorV3 rightColorSensor = new ColorSensorV3(RobotMap.RIGHT_COLOR_SENSOR_PORT);
-    Ultrasonic intakeSensor = new Ultrasonic(RobotMap.INTAKE_ULTRASONIC_PORTS[0], RobotMap.INTAKE_ULTRASONIC_PORTS[1]);
-    Intake intake = new IntakeImpl(intakeMotorController, leftColorSensor, rightColorSensor, intakeSensor);
+    // WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
+    //ColorSensorV3 leftColorSensor = new ColorSensorV3(RobotMap.LEFT_COLOR_SENSOR_PORT);
+    //ColorSensorV3 rightColorSensor = new ColorSensorV3(RobotMap.RIGHT_COLOR_SENSOR_PORT);
+    //Ultrasonic intakeSensor = new Ultrasonic(RobotMap.INTAKE_ULTRASONIC_PORTS[0], RobotMap.INTAKE_ULTRASONIC_PORTS[1]);
+    // Intake intake = new IntakeImpl(intakeMotorController, leftColorSensor, rightColorSensor, intakeSensor);
     
     // ELEVATOR COMPONENTS
-    WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
-    Elevator elevator = new ElevatorImpl(elevatorMotorController);
+    // WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
+    // Elevator elevator = new ElevatorImpl(elevatorMotorController);
 
     // SHOOTER COMPONENTS
-    Shooter shooter = new ShooterImpl();
+    // Shooter shooter = new ShooterImpl();
 
-    // ELEVATOR SENSOR
-    Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
+    // // ELEVATOR SENSOR
+    // Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
     
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
-    this.ballSubsystem = new BallPathImpl(intake, elevator, shooter, elevatorSensor);
-    this.climberSubsystem = new ClimberImpl();
+    //this.ballSubsystem = new BallPathImpl(intake, elevator, shooter, elevatorSensor);
+    //this.climberSubsystem = new ClimberImpl();
 
     // register lifecycle components
     registerLifecycleComponent(driverPad);
     registerLifecycleComponent(drive);
-    registerLifecycleComponent(ballSubsystem);
+    //registerLifecycleComponent(ballSubsystem);
   }
 
   /**
@@ -182,6 +186,12 @@ public class Robot extends TitanBot {
   @Override
   public void teleopRoutine() {
     this.drive.driveArcade(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
+    // this.drive.driveTank(this,driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS));
+
+    // Some pid code
+    // this.drive.setSetpoint(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS));
+    // this.drive.drivePidTank();
+
 
   }
 
