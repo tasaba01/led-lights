@@ -8,13 +8,13 @@ public final class RobotMap {
     public static final int OPERATOR_PAD_PORT = 1;
 
     // ENCODERS PORTS (change when ports are final)
-    public static final int[] LEFT_ENCODER_PORTS = {0, 0}; 
-    public static final int[] RIGHT_ENCODER_PORTS = {0, 0}; 
+    // public static final int[] LEFT_ENCODER_PORTS = {0, 0}; 
+    // public static final int[] RIGHT_ENCODER_PORTS = {0, 0}; 
 
     // assumes current motor config, can be changed later (change when ports are final)
 
-    public static final int[] NEO_LEFT_DRIVE_PORTS = {0, 0};
-    public static final int[] NEO_RIGHT_DRIVE_PORTS = {0, 0};
+    public static final int[] NEO_LEFT_DRIVE_PORTS = {1, 2};
+    public static final int[] NEO_RIGHT_DRIVE_PORTS = {3, 4};
 
     public static final Port LEFT_COLOR_SENSOR_PORT = Port.kOnboard;
     public static final Port RIGHT_COLOR_SENSOR_PORT = Port.kOnboard;

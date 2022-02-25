@@ -2,12 +2,15 @@ package frc.robot.subsystems.Drivetrain;
 
 import java.util.concurrent.TimeUnit;
 
+import com.revrobotics.RelativeEncoder;
+
 import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
-import edu.wpi.first.wpilibj.Encoder;
+// import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.Pair;
 
 public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
@@ -18,8 +21,11 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     private final DifferentialDrive drivetrain;
 
     // encoder
-    private final Encoder leftEncoder;
-    private final Encoder rightEncoder;
+    
+    private final RelativeEncoder leftEncoder1;
+    private final RelativeEncoder leftEncoder2;
+    private final RelativeEncoder rightEncoder1;
+    private final RelativeEncoder rightEncoder2;
 
     // PID controller values
 
@@ -33,14 +39,16 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     private final PIDController rightPIDController;
 
 
-    public DriveImpl(SpeedControllerGroup leftSide, SpeedControllerGroup rightSide, Encoder leftEncoder, Encoder rightEncoder) {
+    public DriveImpl(SpeedControllerGroup leftSide, SpeedControllerGroup rightSide, RelativeEncoder leftEncoder1, RelativeEncoder leftEncoder2, RelativeEncoder rightEncoder1, RelativeEncoder rightEncoder2) {
         super(20, TimeUnit.MILLISECONDS);
         // basic drivetrain stuff
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.drivetrain = new DifferentialDrive(leftSide, rightSide);
-        this.leftEncoder = leftEncoder; 
-        this.rightEncoder = rightEncoder;
+        this.leftEncoder1 = leftEncoder1; 
+        this.leftEncoder2 = leftEncoder2; 
+        this.rightEncoder1 = rightEncoder1; 
+        this.rightEncoder2 = rightEncoder2; 
 
         // PID controller impl
         this.leftPIDController = new PIDController(kp, ki, kd);
@@ -53,8 +61,10 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         require(leftSide);
         require(rightSide);
         
-        require(leftEncoder);
-        require(rightEncoder);
+        require(leftEncoder1);
+        require(rightEncoder1);
+        require(leftEncoder2);
+        require(rightEncoder2);
     }
 
     @Override
@@ -72,8 +82,10 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         this.drivetrain.arcadeDrive(speed, rotation);
     }
 
-    public void DrivePid(){
-        this.drivetrain.tankDrive(this.leftPIDController.calculate(this.leftEncoder.get()), this.rightPIDController.calculate(this.rightEncoder.get()));
+    public void drivePidTank(){
+        this.drivetrain.tankDrive(this.leftPIDController.calculate(this.leftEncoder1.getVelocity()), this.rightPIDController.calculate(this.rightEncoder1.getVelocity()));
+        SmartDashboard.putNumber("left encoder velocity", this.leftEncoder1.getVelocity());
+        SmartDashboard.putNumber("Right Encoder Velocity", this.rightEncoder1.getVelocity());
     }
 
     @Override
@@ -84,18 +96,20 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     @Override
     public void resetEncoderTicks() {
         // Done
-        this.leftEncoder.reset();
-        this.rightEncoder.reset();
+        // this.leftEncoder.reset();
+        // this.rightEncoder.reset();
+        // removing this for now as relative encoder reset on boot
     }
 
     @Override
     public Pair<Double, Double> distanceDriven() {
         // return distance of either encoder
-        return Pair.of(this.leftEncoder.getDistance(), this.rightEncoder.getDistance());
+        return Pair.of(this.leftEncoder1.getPosition() , this.rightEncoder1.getPosition());
     }
 
     public void setSetpoint(double setpoint){
-        // TODO Set setpoints for encoders
+        this.leftPIDController.setSetpoint(setpoint);
+        this.rightPIDController.setSetpoint(setpoint);
         
     }
     
