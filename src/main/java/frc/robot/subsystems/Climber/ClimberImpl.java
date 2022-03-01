@@ -1,17 +1,17 @@
 package frc.robot.subsystems.Climber;
 
-import java.lang.Thread;
+// import java.lang.Thread;
 import java.util.concurrent.TimeUnit;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+// import edu.wpi.first.wpilibj.DoubleSolenoid;
 import frc.robot.RobotMap;
 
 public class ClimberImpl implements Climber {
      
     private long starttime = 0;
 
-    WPI_TalonSRX lifterMotorController;
+    private WPI_TalonSRX lifterMotorController;
     //DoubleSolenoid climberSolenoid;
 
     public ClimberImpl() {

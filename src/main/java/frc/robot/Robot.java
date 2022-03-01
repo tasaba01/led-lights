@@ -5,12 +5,12 @@
 package frc.robot;
 
 import ca.team3161.lib.robot.TitanBot;
-import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
+// import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.SquaredJoystickMode;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+// import edu.wpi.first.wpilibj.Encoder;
+// import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain.Drive;
@@ -26,8 +26,10 @@ import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberImpl;
 
+import com.revrobotics.CANSparkMax;
 // Intake Imports
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Ultrasonic;
 /**
@@ -63,17 +65,37 @@ public class Robot extends TitanBot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     // DRIVETRAIN COMPONENTS
-    PWMSparkMax leftMotorController1 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0]);
-    PWMSparkMax leftMotorController2 = new PWMSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1]);
-    SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
+    CANSparkMax leftControllerPrimary = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0], MotorType.kBrushless);
+    CANSparkMax leftControllerFollower = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1], MotorType.kBrushless);
+    CANSparkMax rightControllerPrimary = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0], MotorType.kBrushless);
+    CANSparkMax rightControllerFollower = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1], MotorType.kBrushless);
+    
+    
+    leftControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    // leftControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    rightControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    // rightControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    
+    leftControllerPrimary.restoreFactoryDefaults();
+    leftControllerFollower.restoreFactoryDefaults();
+    rightControllerPrimary.restoreFactoryDefaults();
+    rightControllerFollower.restoreFactoryDefaults();
 
-    PWMSparkMax rightMotorController1 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0]);
-    PWMSparkMax rightMotorController2 = new PWMSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1]);
-    SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
+    leftControllerFollower.follow(leftControllerPrimary);
+    rightControllerFollower.follow(rightControllerPrimary);
 
-    Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
-    Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
-    this.drive = new DriveImpl(leftSide, rightSide, leftEncoder, rightEncoder);
+    rightControllerPrimary.setInverted(true);
+    
+    //SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
+    //SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
+    
+    // rightSide.setInverted(true);
+    // Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
+    // Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
+    // RelativeEncoder leftEncoderPrimary = leftControllerPrimary.getEncoder();
+    // RelativeEncoder rightEncoderPrimary = rightControllerPrimary.getEncoder();
+
+    this.drive = new DriveImpl(leftControllerPrimary, rightControllerPrimary);
 
     // INTAKE COMPONENTS
     WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
@@ -147,7 +169,6 @@ public class Robot extends TitanBot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopSetup() {
-    // TODO Set up bindings
     this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new SquaredJoystickMode());
     this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, new SquaredJoystickMode());
 
