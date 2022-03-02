@@ -106,7 +106,7 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     public void setHoodAngle(double setPointHood){
         if(turretHoodPosition >= setPointHood - hoodBuffer && turretHoodPosition <= setPointHood + hoodBuffer){
           hoodMotor.set(ControlMode.PercentOutput, 0);
-          hoodReady = false;
+          hoodReady = true;
         }else if(turretHoodPosition <= setPointHood - hoodBuffer){
           hoodMotor.set(ControlMode.PercentOutput, hoodSpeed);
           hoodReady = false;
@@ -129,7 +129,7 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
 
         if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
           turretMotor.set(ControlMode.PercentOutput, 0);
-          turretReady = false;
+          turretReady = true;
         }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
           turretMotor.set(ControlMode.PercentOutput, turretSpeed);
           turretReady = false;
@@ -156,19 +156,14 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         // Fender shot for teleop
         System.out.println("FENDER SHOT: ");
         setPointHood = 100000;
-        // setPointShooter = 0.33;
         setPointShooterPID = 0; // tbd
         setPointRotation = 0;
         System.out.println("SETPOINT HOOD: " + setPointHood);
         System.out.println("SETPOINT SHOOTER " + setPointShooter);
         System.out.println("SETPOINT FOR THE TURRET TURNING " + setPointRotation);
 
-        // if we dont want to use PID, use the below
-        // shooterMotor.set(ControlMode.PercentOutput, setPointShooter);
-        // System.out.println(setPointShooter);
-
         // pid for shooter
-        if(setPointShooter != 0){
+        if(setPointShooterPID != 0){
           currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooter);
           currentOutput = Utils.normalizePwm(currentOutput);
           System.out.println(currentOutput);
@@ -205,20 +200,15 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         // TODO Auto-generated method stub
         System.out.println("FAR LAUNCHPAD SHOT: ");
         setPointHood = 300000;
-        // setPointShooter = 0.65;
         setPointShooterPID = 0; // tbd
         setPointRotation = 200000;
         System.out.println("SETPOINT HOOD: " + setPointHood);
         System.out.println("SETPOINT SHOOTER " + setPointShooter);
-        System.out.println("SETPOINT FOR THE TURRET TURNING " + setPointRotation);
-
-        // Shooter without PID
-        // shooterMotor.set(ControlMode.PercentOutput, setPointShooter);
-        // SmartDashboard.putNumber("Shooter Output", setPointShooter);
+  
 
         // shooter with PID
         // pid for shooter
-        if(setPointShooter != 0){
+        if(setPointShooterPID != 0){
           currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooter);
           currentOutput = Utils.normalizePwm(currentOutput);
           System.out.println(currentOutput);
@@ -256,20 +246,15 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         // TODO Auto-generated method stub
         System.out.println("CLOSE LAUNCHPAD SHOT: ");
         setPointHood = 0; // to be decided
-        // setPointShooter = 0; // tbd
         setPointShooterPID = 0; // tbd
         setPointRotation = 0; // tbd
         System.out.println("SETPOINT HOOD: " + setPointHood);
         System.out.println("SETPOINT SHOOTER " + setPointShooter);
         System.out.println("SETPOINT FOR THE TURRET TURNING " + setPointRotation);
 
-        // Shooter without PID
-        // shooterMotor.set(ControlMode.PercentOutput, setPointShooter);
-        // SmartDashboard.putNumber("Shooter Output", setPointShooter);
 
         // shooter with PID
-        // pid for shooter
-        if(setPointShooter != 0){
+        if(setPointShooterPID != 0){
           currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooter);
           currentOutput = Utils.normalizePwm(currentOutput);
           System.out.println(currentOutput);
@@ -308,20 +293,15 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         // TODO Auto-generated method stub
         System.out.println("CLOSE LAUNCHPAD SHOT: ");
         setPointHood = 0; // to be decided
-        // setPointShooter = 0; // tbd
         setPointShooterPID = 0; // tbd
         setPointRotation = 0; // will probably still be 0 for the auto shot
         System.out.println("SETPOINT HOOD: " + setPointHood);
         System.out.println("SETPOINT SHOOTER " + setPointShooter);
         System.out.println("SETPOINT FOR THE TURRET TURNING " + setPointRotation);
 
-        // Shooter without PID
-        // shooterMotor.set(ControlMode.PercentOutput, setPointShooter);
-        // SmartDashboard.putNumber("Shooter Output", setPointShooter);
 
         // shooter with PID
-        // pid for shooter
-        if(setPointShooter != 0){
+        if(setPointShooterPID != 0){
           currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooter);
           currentOutput = Utils.normalizePwm(currentOutput);
           System.out.println(currentOutput);
