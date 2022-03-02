@@ -55,7 +55,18 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         this.turretMotor = turretMotor;
         this.shooterMotor = shooterMotor;
         this.hoodMotor = hoodMotor;
+    }
 
+    @Override
+    public void defineResources(){
+        require(turretMotor);
+        require(shooterMotor);
+        require(hoodMotor);
+
+    }
+
+    @Override
+    public void task(){
         shooterEncoderReadingPosition = shooterMotor.getSelectedSensorPosition();
         shooterEncoderReadingVelocity = shooterMotor.getSelectedSensorVelocity();
         turretHoodPosition = hoodMotor.getSelectedSensorPosition();
@@ -69,19 +80,7 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         SmartDashboard.putNumber("Turret Encoder Reading Velocity", turretEncoderReadingVelocity);
         SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
         SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
-
     }
-
-    @Override
-    public void defineResources(){
-        require(turretMotor);
-        require(shooterMotor);
-        require(hoodMotor);
-
-    }
-
-    @Override
-    public void task(){}
 
     @Override
     public void findAndCenterTarget() {}
