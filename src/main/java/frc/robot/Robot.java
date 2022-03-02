@@ -126,10 +126,10 @@ public class Robot extends TitanBot {
     // Elevator elevator = new ElevatorImpl(elevatorMotorController);
 
     // SHOOTER COMPONENTS
-    TalonSRX turretMoter = new TalonSRX(RobotMap.TURRET_PORT);
+    TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
     TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
     TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
-    Shooter shooter = new ShooterImpl(turretMoter, shooterMotor, hoodMotor);
+    Shooter shooter = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
 
     // // ELEVATOR SENSOR
     // Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);

@@ -41,6 +41,12 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
 
     double currentOutput;
 
+    private final double hoodBuffer = 20000;
+    private final double turretBuffer = 30000;
+    private final double turretSpeed = 0.3;
+    private final double hoodSpeed = 0.3;
+
+
     private final PIDController shooterPid = new PIDController(kp, ki, kd);
 
     public ShooterImpl(TalonSRX turretMotor, TalonFX shooterMotor, TalonSRX hoodMotor) {
@@ -72,12 +78,6 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         require(shooterMotor);
         require(hoodMotor);
 
-        require(shooterEncoderReadingPosition);
-        require(shooterEncoderReadingVelocity);
-        require(turretHoodPosition);
-        require(turretHoodVelocity);
-        require(turretEncoderReadingPosition);
-        require(turretEncoderReadingVelocity);
     }
 
     @Override
@@ -95,11 +95,7 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     // runs flywheel
     @Override
     public boolean readyToShoot(){
-        if (turretReady && hoodReady){
-            return true;
-        }else{
-            return false;
-        }
+        return turretReady && hoodReady;
     }
 
     @Override
@@ -109,14 +105,14 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
 
     @Override
     public void setHoodAngle(double setPointHood){
-        if(turretHoodPosition >= setPointHood - 20000 && turretHoodPosition <= setPointHood + 20000){
+        if(turretHoodPosition >= setPointHood - hoodBuffer && turretHoodPosition <= setPointHood + hoodBuffer){
           hoodMotor.set(ControlMode.PercentOutput, 0);
           hoodReady = false;
-        }else if(turretHoodPosition <= setPointHood - 20000){
-          hoodMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretHoodPosition <= setPointHood - hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, hoodSpeed);
           hoodReady = false;
-        }else if (turretHoodPosition >= setPointHood + 20000){
-          hoodMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretHoodPosition >= setPointHood + hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, -hoodSpeed);
           hoodReady = false;
         }
     }
@@ -132,25 +128,25 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
 
         shooterMotor.set(ControlMode.PercentOutput, 0);
 
-        if(turretEncoderReadingPosition >= setPointRotation - 30000 && turretEncoderReadingPosition <= setPointRotation + 30000){
+        if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
           turretMotor.set(ControlMode.PercentOutput, 0);
           turretReady = false;
-        }else if(turretEncoderReadingPosition <= setPointRotation - 30000){
-          turretMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, turretSpeed);
           turretReady = false;
-        }else if (turretEncoderReadingPosition >= setPointRotation + 30000){
-          turretMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretEncoderReadingPosition >= setPointRotation + turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, -turretSpeed);
           turretReady = false;
         }
         
-        if(turretHoodPosition >= setPointHood - 20000 && turretHoodPosition <= setPointHood + 20000){
+        if(turretHoodPosition >= setPointHood - hoodBuffer && turretHoodPosition <= setPointHood + hoodBuffer){
           hoodMotor.set(ControlMode.PercentOutput, 0);
+          hoodReady = true;
+        }else if(turretHoodPosition <= setPointHood - hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, hoodSpeed);
           hoodReady = false;
-        }else if(turretHoodPosition <= setPointHood - 20000){
-          hoodMotor.set(ControlMode.PercentOutput, 0.3);
-          hoodReady = false;
-        }else if (turretHoodPosition >= setPointHood + 20000){
-          hoodMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretHoodPosition >= setPointHood + hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, -hoodSpeed);
           hoodReady = false;
         }
 
@@ -182,25 +178,25 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
           SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         }
 
-        if(turretEncoderReadingPosition >= setPointRotation - 30000 && turretEncoderReadingPosition <= setPointRotation + 30000){
+        if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
           turretMotor.set(ControlMode.PercentOutput, 0);
           turretReady = true;
-        }else if(turretEncoderReadingPosition <= setPointRotation - 30000){
-          turretMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, turretSpeed);
           turretReady = false;
-        }else if (turretEncoderReadingPosition >= setPointRotation + 30000){
-          turretMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretEncoderReadingPosition >= setPointRotation + turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, -turretSpeed);
           turretReady = false;
         }
       
-        if(turretHoodPosition >= setPointHood - 20000 && turretHoodPosition <= setPointHood + 20000){
+        if(turretHoodPosition >= setPointHood - hoodBuffer && turretHoodPosition <= setPointHood + hoodBuffer){
           hoodMotor.set(ControlMode.PercentOutput, 0);
           hoodReady = true;
-        }else if(turretHoodPosition <= setPointHood - 20000){
-          hoodMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretHoodPosition <= setPointHood - hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, hoodSpeed);
           hoodReady = false;
-        }else if (turretHoodPosition >= setPointHood + 20000){
-          hoodMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretHoodPosition >= setPointHood + hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, -hoodSpeed);
           hoodReady = false;
         }
     }
@@ -232,25 +228,25 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
           SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         }
 
-        if(turretEncoderReadingPosition >= setPointRotation - 30000 && turretEncoderReadingPosition <= setPointRotation + 30000){
+        if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
           turretMotor.set(ControlMode.PercentOutput, 0);
           turretReady = true;
-        }else if(turretEncoderReadingPosition <= setPointRotation - 30000){
-          turretMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, turretSpeed);
           turretReady = false;
-        }else if (turretEncoderReadingPosition >= setPointRotation + 30000){
-          turretMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretEncoderReadingPosition >= setPointRotation + turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, -turretSpeed);
           turretReady = false;
         }
       
-        if(turretHoodPosition >= setPointHood - 20000 && turretHoodPosition <= setPointHood + 20000){
+        if(turretHoodPosition >= setPointHood - hoodBuffer && turretHoodPosition <= setPointHood + hoodBuffer){
           hoodMotor.set(ControlMode.PercentOutput, 0);
           turretReady = true;
-        }else if(turretHoodPosition <= setPointHood - 20000){
-          hoodMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretHoodPosition <= setPointHood - hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, hoodSpeed);
           turretReady = false;
-        }else if (turretHoodPosition >= setPointHood + 20000){
-          hoodMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretHoodPosition >= setPointHood + hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, -hoodSpeed);
           turretReady = false;
         }
 
@@ -283,25 +279,25 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
           SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         }
 
-        if(turretEncoderReadingPosition >= setPointRotation - 30000 && turretEncoderReadingPosition <= setPointRotation + 30000){
+        if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
           turretMotor.set(ControlMode.PercentOutput, 0);
           turretReady = true;
-        }else if(turretEncoderReadingPosition <= setPointRotation - 30000){
-          turretMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, turretSpeed);
           turretReady = false;
-        }else if (turretEncoderReadingPosition >= setPointRotation + 30000){
-          turretMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretEncoderReadingPosition >= setPointRotation + turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, -turretSpeed);
           turretReady = false;
         }
       
-        if(turretHoodPosition >= setPointHood - 20000 && turretHoodPosition <= setPointHood + 20000){
+        if(turretHoodPosition >= setPointHood - hoodBuffer && turretHoodPosition <= setPointHood + hoodBuffer){
           hoodMotor.set(ControlMode.PercentOutput, 0);
           turretReady = true;
-        }else if(turretHoodPosition <= setPointHood - 20000){
-          hoodMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretHoodPosition <= setPointHood - hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, hoodSpeed);
           turretReady = false;
-        }else if (turretHoodPosition >= setPointHood + 20000){
-          hoodMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretHoodPosition >= setPointHood + hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, -hoodSpeed);
           turretReady = false;
         }
         
@@ -335,25 +331,25 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
           SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         }
 
-        if(turretEncoderReadingPosition >= setPointRotation - 30000 && turretEncoderReadingPosition <= setPointRotation + 30000){
+        if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
           turretMotor.set(ControlMode.PercentOutput, 0);
           turretReady = true;
-        }else if(turretEncoderReadingPosition <= setPointRotation - 30000){
-          turretMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, turretSpeed);
           turretReady = false;
-        }else if (turretEncoderReadingPosition >= setPointRotation + 30000){
-          turretMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretEncoderReadingPosition >= setPointRotation + turretBuffer){
+          turretMotor.set(ControlMode.PercentOutput, -turretSpeed);
           turretReady = false;
         }
       
-        if(turretHoodPosition >= setPointHood - 20000 && turretHoodPosition <= setPointHood + 20000){
+        if(turretHoodPosition >= setPointHood - hoodBuffer && turretHoodPosition <= setPointHood + hoodBuffer){
           hoodMotor.set(ControlMode.PercentOutput, 0);
           turretReady = true;
-        }else if(turretHoodPosition <= setPointHood - 20000){
-          hoodMotor.set(ControlMode.PercentOutput, 0.3);
+        }else if(turretHoodPosition <= setPointHood - hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, hoodSpeed);
           turretReady = false;
-        }else if (turretHoodPosition >= setPointHood + 20000){
-          hoodMotor.set(ControlMode.PercentOutput, -0.3);
+        }else if (turretHoodPosition >= setPointHood + hoodBuffer){
+          hoodMotor.set(ControlMode.PercentOutput, -hoodSpeed);
           turretReady = false;
         }
     }
