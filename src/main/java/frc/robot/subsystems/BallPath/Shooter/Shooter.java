@@ -9,11 +9,15 @@ public interface Shooter extends Subsystem{
     // runs flywheel
     boolean readyToShoot();
     int checkBalls();
-    void setHoodAngle(double distance);
-    void start();
-    void stop();
-    void shootFender();
-    void shootFarLaunch();
-    void shootCloseLaunch();
-    void shootAuto();
+    void stopMotors();
+    void setShotPosition(ShotPosition shotPosition);
+
+    enum ShotPosition {
+        NONE,
+        LAUNCHPAD_CLOSE,
+        LAUNCHPAD_FAR,
+        FENDER,
+        AUTO,
+        ;
+    }
 }
