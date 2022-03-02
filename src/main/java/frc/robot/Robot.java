@@ -6,6 +6,9 @@ package frc.robot;
 
 import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
+import ca.team3161.lib.utils.controls.DeadbandJoystickMode;
+import ca.team3161.lib.utils.controls.InvertedJoystickMode;
+import ca.team3161.lib.utils.controls.JoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.SquaredJoystickMode;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
@@ -84,7 +87,9 @@ public class Robot extends TitanBot {
     
     
     leftControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    leftControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
     rightControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    rightControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
     
     leftControllerPrimary.restoreFactoryDefaults();
     leftControllerFollower.restoreFactoryDefaults();
@@ -94,7 +99,7 @@ public class Robot extends TitanBot {
     leftControllerFollower.follow(leftControllerPrimary);
     rightControllerFollower.follow(rightControllerPrimary);
 
-    rightControllerPrimary.setInverted(true);
+    leftControllerPrimary.setInverted(true);
     
     //SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
     //SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
@@ -180,8 +185,9 @@ public class Robot extends TitanBot {
   @Override
   public void teleopSetup() {
     // TODO Set up bindings
-    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new SquaredJoystickMode());
-    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, new SquaredJoystickMode());
+    JoystickMode mode = new DeadbandJoystickMode(0.05).andThen(new SquaredJoystickMode());
+    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(mode));
+    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, mode);
 
     
     this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());

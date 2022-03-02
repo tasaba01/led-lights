@@ -2,6 +2,8 @@ package frc.robot.subsystems.Drivetrain;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.namespace.QName;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -9,14 +11,17 @@ import com.revrobotics.SparkMaxPIDController;
 import ca.team3161.lib.robot.LifecycleEvent;
 // import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 // import edu.wpi.first.wpilibj.Encoder;
 // import edu.wpi.first.math.controller.PIDController;
 // import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 
 public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
-    
+
     // motor controller groups
     private CANSparkMax leftSide;
     private CANSparkMax rightSide;
@@ -28,19 +33,20 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // PID controller values
 
-    private double kP = 6e-5; 
+    private double kP = 0.000750; 
     private double kI = 0;
-    private double kD = 0; 
+    private double kD = 0.000100; 
     private double kIz = 0; 
-    private double kFF = 0.000015; 
+    private double kFF = 0; 
     private double kMaxOutput = 1; 
     private double kMinOutput = -1;
-    private double maxRPM = 5700;
+    private double maxRPM = 5200;
 
     // PID controllers
     
     private final SparkMaxPIDController leftPIDController;
     private final SparkMaxPIDController rightPIDController;
+    private DifferentialDrive drivetrain;
 
 
     public DriveImpl(CANSparkMax leftSide, CANSparkMax rightSide, RelativeEncoder leftEncoder, RelativeEncoder rightEncoder) {
@@ -48,7 +54,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         // basic drivetrain stuff
         this.leftSide = leftSide;
         this.rightSide = rightSide;
-        //this.drivetrain = new DifferentialDrive(leftSide, rightSide);
+        this.drivetrain = new DifferentialDrive(leftSide, rightSide);
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder; 
 
@@ -100,13 +106,61 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     @Override
     public void driveTank(double leftSpeed, double rightSpeed) {
-        //this.drivetrain.tankDrive(leftSpeed, rightSpeed);
+        this.drivetrain.tankDrive(leftSpeed, rightSpeed);
+        SmartDashboard.putNumber("Left Encoder Velocity", leftEncoder.getVelocity());
+        SmartDashboard.putNumber("Right Encoder Velocity", rightEncoder.getVelocity());
     }
 
     @Override
     public void driveArcade(double speed, double rotation) {
         //this.drivetrain.arcadeDrive(speed, rotation);
     }
+
+    public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
+        xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
+        zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
+    
+        // Square the inputs (while preserving the sign) to increase fine control
+        // while permitting full power.
+        // if (squareInputs) {
+        //   xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
+        //   zRotation = Math.copySign(zRotation * zRotation, zRotation);
+        // }
+    
+        double leftSpeed;
+        double rightSpeed;
+    
+        double maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
+    
+        if (xSpeed >= 0.0) {
+          // First quadrant, else second quadrant
+          if (zRotation >= 0.0) {
+            leftSpeed = maxInput;
+            rightSpeed = xSpeed - zRotation;
+          } else {
+            leftSpeed = xSpeed + zRotation;
+            rightSpeed = maxInput;
+          }
+        } else {
+          // Third quadrant, else fourth quadrant
+          if (zRotation >= 0.0) {
+            leftSpeed = xSpeed + zRotation;
+            rightSpeed = maxInput;
+          } else {
+            leftSpeed = maxInput;
+            rightSpeed = xSpeed - zRotation;
+          }
+        }
+    
+        // Normalize the wheel speeds
+        double maxMagnitude = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+        if (maxMagnitude > 1.0) {
+          leftSpeed /= maxMagnitude;
+          rightSpeed /= maxMagnitude;
+        }
+    
+        return new WheelSpeeds(leftSpeed, rightSpeed);
+      }
 
     public void  drivePidTank(double leftSpeed, double rotation){
 
@@ -117,7 +171,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         double d = SmartDashboard.getNumber("D Gain", 0);
         double iz = SmartDashboard.getNumber("I Zone", 0);
         double ff = SmartDashboard.getNumber("Feed Forward", 0);
-        double max = SmartDashboard.getNumber("Max Output", 0);
+        double max = SmartDashboard.getNumber("Max Output", 1);
         double min = SmartDashboard.getNumber("Min Output", 0);
 
         // if PID coefficients on SmartDashboard have changed, write new values to controller
@@ -147,10 +201,14 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
          *  com.revrobotics.CANSparkMax.ControlType.kVelocity
          *  com.revrobotics.CANSparkMax.ControlType.kVoltage
          */
-        double leftSetPoint = leftSpeed*maxRPM;
-        double rotationSetPoint = rotation*maxRPM;
-        leftPIDController.setReference(leftSetPoint+rotationSetPoint, CANSparkMax.ControlType.kVelocity);
-        rightPIDController.setReference(leftSetPoint-rotationSetPoint, CANSparkMax.ControlType.kVelocity);
+    
+        var speeds = arcadeDriveIK(leftSpeed, rotation, true);
+    
+        double leftSetPoint = speeds.left * maxRPM;
+        double rightSetPoint = speeds.right * maxRPM;
+
+        leftPIDController.setReference(leftSetPoint, CANSparkMax.ControlType.kVelocity);
+        rightPIDController.setReference(rightSetPoint, CANSparkMax.ControlType.kVelocity);
         
         SmartDashboard.putNumber("Left SetPoint", leftSetPoint);
         SmartDashboard.putNumber("Right SetPoint", leftSetPoint);
