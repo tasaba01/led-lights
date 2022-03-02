@@ -113,7 +113,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
     @Override
     public void stopShooter(){
-        this.shooter.stop();
+        this.shooter.stopMotors();
     }
         
     @Override
