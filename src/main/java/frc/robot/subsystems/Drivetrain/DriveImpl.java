@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 
 import ca.team3161.lib.robot.LifecycleEvent;
 // import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
@@ -238,11 +239,11 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         return Pair.of(this.leftEncoder.getPosition() , this.rightEncoder.getPosition());
     }
 
-    //public void setSetpoint(double setpoint){
-    //    this.leftPIDController.setSetpoint(setpoint);
-    //    this.rightPIDController.setSetpoint(setpoint);
-    //    
-    //}
+    public void setSetpoint(double leftSetPoint, double rightSetPoint){
+       this.leftPIDController.setReference(leftSetPoint, ControlType.kPosition);
+       this.rightPIDController.setReference(rightSetPoint, ControlType.kPosition);
+       
+    }
     
     @Override
     public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {}
