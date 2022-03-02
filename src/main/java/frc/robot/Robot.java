@@ -42,6 +42,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Controller;
@@ -124,7 +126,10 @@ public class Robot extends TitanBot {
     // Elevator elevator = new ElevatorImpl(elevatorMotorController);
 
     // SHOOTER COMPONENTS
-    // Shooter shooter = new ShooterImpl();
+    // TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
+    // TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
+    // TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
+    // Shooter shooter = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
 
     // // ELEVATOR SENSOR
     // Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);

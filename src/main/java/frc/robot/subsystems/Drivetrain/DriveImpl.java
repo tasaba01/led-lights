@@ -58,6 +58,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder; 
 
+
         // PID controller impl
         this.leftPIDController = leftSide.getPIDController();
         this.rightPIDController = rightSide.getPIDController();
@@ -113,7 +114,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     @Override
     public void driveArcade(double speed, double rotation) {
-        //this.drivetrain.arcadeDrive(speed, rotation);
+        this.drivetrain.arcadeDrive(speed, rotation);
     }
 
     public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
