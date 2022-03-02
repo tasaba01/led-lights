@@ -25,7 +25,6 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     private double kd = 0.00003;
 
     private double setPointHood;
-    private double setPointShooter;
     private double setPointRotation;
     private double setPointShooterPID;
 
@@ -159,16 +158,16 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         setPointShooterPID = 0; // tbd
         setPointRotation = 0;
         System.out.println("SETPOINT HOOD: " + setPointHood);
-        System.out.println("SETPOINT SHOOTER " + setPointShooter);
+        System.out.println("SETPOINT SHOOTER " + setPointShooterPID);
         System.out.println("SETPOINT FOR THE TURRET TURNING " + setPointRotation);
 
         // pid for shooter
         if(setPointShooterPID != 0){
-          currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooter);
+          currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooterPID);
           currentOutput = Utils.normalizePwm(currentOutput);
           System.out.println(currentOutput);
           this.shooterMotor.set(ControlMode.PercentOutput, currentOutput);
-          SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooter);
+          SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooterPID);
           SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         }
 
@@ -203,17 +202,17 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         setPointShooterPID = 0; // tbd
         setPointRotation = 200000;
         System.out.println("SETPOINT HOOD: " + setPointHood);
-        System.out.println("SETPOINT SHOOTER " + setPointShooter);
+        System.out.println("SETPOINT SHOOTER " + setPointShooterPID);
   
 
         // shooter with PID
         // pid for shooter
         if(setPointShooterPID != 0){
-          currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooter);
+          currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooterPID);
           currentOutput = Utils.normalizePwm(currentOutput);
           System.out.println(currentOutput);
           this.shooterMotor.set(ControlMode.PercentOutput, currentOutput);
-          SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooter);
+          SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooterPID);
           SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         }
 
@@ -249,17 +248,17 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         setPointShooterPID = 0; // tbd
         setPointRotation = 0; // tbd
         System.out.println("SETPOINT HOOD: " + setPointHood);
-        System.out.println("SETPOINT SHOOTER " + setPointShooter);
+        System.out.println("SETPOINT SHOOTER " + setPointShooterPID);
         System.out.println("SETPOINT FOR THE TURRET TURNING " + setPointRotation);
 
 
         // shooter with PID
         if(setPointShooterPID != 0){
-          currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooter);
+          currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooterPID);
           currentOutput = Utils.normalizePwm(currentOutput);
           System.out.println(currentOutput);
           this.shooterMotor.set(ControlMode.PercentOutput, currentOutput);
-          SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooter);
+          SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooterPID);
           SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         }
 
@@ -296,17 +295,17 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         setPointShooterPID = 0; // tbd
         setPointRotation = 0; // will probably still be 0 for the auto shot
         System.out.println("SETPOINT HOOD: " + setPointHood);
-        System.out.println("SETPOINT SHOOTER " + setPointShooter);
+        System.out.println("SETPOINT SHOOTER " + setPointShooterPID);
         System.out.println("SETPOINT FOR THE TURRET TURNING " + setPointRotation);
 
 
         // shooter with PID
         if(setPointShooterPID != 0){
-          currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooter);
+          currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooterPID);
           currentOutput = Utils.normalizePwm(currentOutput);
           System.out.println(currentOutput);
           this.shooterMotor.set(ControlMode.PercentOutput, currentOutput);
-          SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooter);
+          SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooterPID);
           SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         }
 
