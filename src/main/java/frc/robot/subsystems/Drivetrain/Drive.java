@@ -7,9 +7,10 @@ import edu.wpi.first.math.Pair;
 public interface Drive extends Subsystem, LifecycleListener{
     void driveTank(double leftSpeed, double rightSpeed);
     void driveArcade(double speed, double rotation);
-    void setSetpoint(double setpoint);
-    void drivePidTank();
+    //void setSetpoint(double setpoint);
+    void drivePidTank(double leftSpeed, double rotation);
     double getHeading();
     void resetEncoderTicks();
     Pair<Double, Double> distanceDriven();
 }
+

@@ -6,6 +6,9 @@ package frc.robot;
 
 import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
+import ca.team3161.lib.utils.controls.DeadbandJoystickMode;
+import ca.team3161.lib.utils.controls.InvertedJoystickMode;
+import ca.team3161.lib.utils.controls.JoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.SquaredJoystickMode;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
@@ -34,9 +37,11 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 
+
 // Intake Imports
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Controller;
@@ -75,33 +80,37 @@ public class Robot extends TitanBot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     // DRIVETRAIN COMPONENTS
-    CANSparkMax leftMotorController1 = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0], MotorType.kBrushless);
-    CANSparkMax leftMotorController2 = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1], MotorType.kBrushless);
-    CANSparkMax rightMotorController1 = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0], MotorType.kBrushless);
-    CANSparkMax rightMotorController2 = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1], MotorType.kBrushless);
+    CANSparkMax leftControllerPrimary = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[0], MotorType.kBrushless);
+    CANSparkMax leftControllerFollower = new CANSparkMax(RobotMap.NEO_LEFT_DRIVE_PORTS[1], MotorType.kBrushless);
+    CANSparkMax rightControllerPrimary = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0], MotorType.kBrushless);
+    CANSparkMax rightControllerFollower = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1], MotorType.kBrushless);
     
+    
+    leftControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    leftControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    rightControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    rightControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    
+    leftControllerPrimary.restoreFactoryDefaults();
+    leftControllerFollower.restoreFactoryDefaults();
+    rightControllerPrimary.restoreFactoryDefaults();
+    rightControllerFollower.restoreFactoryDefaults();
 
+    leftControllerFollower.follow(leftControllerPrimary);
+    rightControllerFollower.follow(rightControllerPrimary);
+
+    leftControllerPrimary.setInverted(true);
     
-    leftMotorController1.restoreFactoryDefaults();
-    leftMotorController2.restoreFactoryDefaults();
-    rightMotorController1.restoreFactoryDefaults();
-    rightMotorController2.restoreFactoryDefaults();
-    
-    rightMotorController1.setInverted(true);
-    rightMotorController2.setInverted(true);
-    
-    SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
-    SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
+    //SpeedControllerGroup leftSide = new SpeedControllerGroup(leftMotorController1, leftMotorController2);
+    //SpeedControllerGroup rightSide = new SpeedControllerGroup(rightMotorController1, rightMotorController2);
     
     // rightSide.setInverted(true);
     // Encoder leftEncoder = new Encoder(RobotMap.LEFT_ENCODER_PORTS[0], RobotMap.LEFT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     // Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
-    RelativeEncoder leftEncoder1 = leftMotorController1.getEncoder();
-    RelativeEncoder leftEncoder2 = leftMotorController2.getEncoder();
-    RelativeEncoder rightEncoder1 = rightMotorController1.getEncoder();
-    RelativeEncoder rightEncoder2 = rightMotorController2.getEncoder();
+    RelativeEncoder leftEncoderPrimary = leftControllerPrimary.getEncoder();
+    RelativeEncoder rightEncoderPrimary = rightControllerPrimary.getEncoder();
 
-    this.drive = new DriveImpl(leftSide, rightSide, leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2);
+    this.drive = new DriveImpl(leftControllerPrimary, rightControllerPrimary, leftEncoderPrimary, rightEncoderPrimary);
 
     // INTAKE COMPONENTS
     // WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
@@ -176,8 +185,9 @@ public class Robot extends TitanBot {
   @Override
   public void teleopSetup() {
     // TODO Set up bindings
-    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new SquaredJoystickMode());
-    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, new SquaredJoystickMode());
+    JoystickMode mode = new DeadbandJoystickMode(0.05).andThen(new SquaredJoystickMode());
+    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(mode));
+    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, mode);
 
     
     this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
@@ -200,8 +210,9 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    this.drive.driveArcade(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
-    // this.drive.driveTank(this,driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS));
+    // this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
+    this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
+    // this.drive.driveTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS));
 
     // Some pid code
     // this.drive.setSetpoint(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS));
