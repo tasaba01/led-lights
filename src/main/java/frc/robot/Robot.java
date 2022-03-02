@@ -70,12 +70,6 @@ public class Robot extends TitanBot {
     CANSparkMax rightControllerPrimary = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0], MotorType.kBrushless);
     CANSparkMax rightControllerFollower = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1], MotorType.kBrushless);
     
-    
-    leftControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    // leftControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    rightControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    // rightControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    
     leftControllerPrimary.restoreFactoryDefaults();
     leftControllerFollower.restoreFactoryDefaults();
     rightControllerPrimary.restoreFactoryDefaults();
@@ -83,6 +77,11 @@ public class Robot extends TitanBot {
 
     leftControllerFollower.follow(leftControllerPrimary);
     rightControllerFollower.follow(rightControllerPrimary);
+
+    leftControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    // leftControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    rightControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    // rightControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     rightControllerPrimary.setInverted(true);
     
@@ -193,8 +192,8 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    this.drive.driveArcade(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
-
+    // this.drive.driveArcade(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
+    this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
   }
 
   /** This function is called once when the robot is disabled. */

@@ -33,8 +33,8 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     private double kP = 6e-5; 
     private double kI = 0;
     private double kD = 0; 
-    private double kIz = 0; 
-    private double kFF = 0.000015; 
+    // private double kIz = 0; 
+    // private double kFF = 0; 
     private double kMaxOutput = 1; 
     private double kMinOutput = -1;
     private double maxRPM = 5700;
@@ -62,15 +62,15 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         leftPIDController.setP(kP);
         leftPIDController.setI(kI);
         leftPIDController.setD(kD);
-        leftPIDController.setIZone(kIz);
-        leftPIDController.setFF(kFF);
+        // leftPIDController.setIZone(kIz);
+        // leftPIDController.setFF(kFF);
         leftPIDController.setOutputRange(kMinOutput, kMaxOutput);
 
         rightPIDController.setP(kP);
         rightPIDController.setI(kI);
         rightPIDController.setD(kD);
-        rightPIDController.setIZone(kIz);
-        rightPIDController.setFF(kFF);
+        // rightPIDController.setIZone(kIz);
+        // rightPIDController.setFF(kFF);
         rightPIDController.setOutputRange(kMinOutput, kMaxOutput);
 
 
@@ -78,8 +78,8 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         SmartDashboard.putNumber("P Gain", kP);
         SmartDashboard.putNumber("I Gain", kI);
         SmartDashboard.putNumber("D Gain", kD);
-        SmartDashboard.putNumber("I Zone", kIz);
-        SmartDashboard.putNumber("Feed Forward", kFF);
+        // SmartDashboard.putNumber("I Zone", kIz);
+        // SmartDashboard.putNumber("Feed Forward", kFF);
 
     }
 
@@ -107,23 +107,24 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         this.drivetrain.arcadeDrive(speed, rotation);
     }
 
-    public void  drivePidTank(double leftSpeed, double rotation){
+    @Override
+    public void  drivePidTank(double speed, double rotation){
 
 
         // read PID coefficients from SmartDashboard
         double p = SmartDashboard.getNumber("P Gain", 0);
         double i = SmartDashboard.getNumber("I Gain", 0);
         double d = SmartDashboard.getNumber("D Gain", 0);
-        double iz = SmartDashboard.getNumber("I Zone", 0);
-        double ff = SmartDashboard.getNumber("Feed Forward", 0);
+        // double iz = SmartDashboard.getNumber("I Zone", 0);
+        // double ff = SmartDashboard.getNumber("Feed Forward", 0);
 
         // if PID coefficients on SmartDashboard have changed, write new values to controller
         
         if((p != kP)) { leftPIDController.setP(p); kP = p; rightPIDController.setP(p); kP = p; }
         if((i != kI)) { leftPIDController.setI(i); kI = i; rightPIDController.setI(i); kI = i; }
         if((d != kD)) { leftPIDController.setD(d); kD = d; rightPIDController.setD(d); kD = d; }
-        if((iz != kIz)) { leftPIDController.setIZone(iz); kIz = iz; rightPIDController.setIZone(iz); kIz = iz; }
-        if((ff != kFF)) { leftPIDController.setFF(ff); kFF = ff; rightPIDController.setFF(ff); kFF = ff; }
+        // if((iz != kIz)) { leftPIDController.setIZone(iz); kIz = iz; rightPIDController.setIZone(iz); kIz = iz; }
+        // if((ff != kFF)) { leftPIDController.setFF(ff); kFF = ff; rightPIDController.setFF(ff); kFF = ff; }
 
         leftPIDController.setOutputRange(kMinOutput, kMaxOutput); 
         rightPIDController.setOutputRange(kMinOutput, kMaxOutput); 
@@ -141,7 +142,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
          *  com.revrobotics.CANSparkMax.ControlType.kVelocity
          *  com.revrobotics.CANSparkMax.ControlType.kVoltage
          */
-        double leftSetPoint = leftSpeed*maxRPM;
+        double leftSetPoint = speed*maxRPM;
         double rotationSetPoint = rotation*maxRPM;
         leftPIDController.setReference(leftSetPoint-(Math.sqrt(rotationSetPoint)), CANSparkMax.ControlType.kVelocity);
         rightPIDController.setReference(leftSetPoint+(Math.sqrt(rotationSetPoint)), CANSparkMax.ControlType.kVelocity);
