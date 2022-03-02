@@ -12,4 +12,8 @@ public interface Shooter extends Subsystem{
     void setHoodAngle(double distance);
     void start();
     void stop();
+    void shootFender();
+    void shootFarLaunch();
+    void shootCloseLaunch();
+    void shootAuto();
 }
