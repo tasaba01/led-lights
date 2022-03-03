@@ -5,7 +5,7 @@
 package frc.robot;
 
 import ca.team3161.lib.robot.TitanBot;
-import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
+// import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.utils.controls.DeadbandJoystickMode;
 import ca.team3161.lib.utils.controls.InvertedJoystickMode;
 import ca.team3161.lib.utils.controls.JoystickMode;
@@ -30,8 +30,6 @@ import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberImpl;
 
 // Spark Max Imports (Drive Train)
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -44,7 +42,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.Controller;
 import edu.wpi.first.wpilibj.Ultrasonic;
 
 // AUTONOMOUS IMPORT

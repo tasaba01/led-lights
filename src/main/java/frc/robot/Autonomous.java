@@ -31,25 +31,44 @@ public class Autonomous {
         this.setPoint = 0;
     }
 
-    double getDistance(RelativeEncoder encoder){
-        double gearRatio = 8;
-        double ticksPer = encoder.getCountsPerRevolution();
-        double revs = encoder.getPosition();
+    double calcDistance(RelativeEncoder encoder){
 
-        distance = ((ticksPer * revs) / gearRatio) * wheelCircumference;
+        distance = calcTicks(encoder) * wheelCircumference;
 
         return distance;
     }
 
+    double calcTicks(RelativeEncoder encoder){
+        // Calculates ticks per revolution(shaft rotation)
+        double gearRatio = 8;
+        double ticksPer = encoder.getCountsPerRevolution();
+        double revs = encoder.getPosition();
+
+        double ticks = ((ticksPer * revs) / gearRatio);
+
+        return ticks;
+    }
+
     double getSetPoint(RelativeEncoder encoder){
-        return getDistance(encoder) / wheelCircumference;
+        return calcDistance(encoder) / wheelCircumference;
     }
 
     // void setSetPoint(double targetDistance){
     //     setPoint = targetDistance / wheelCircumference;
     // }
 
-    void path(){
+    // Inches to Ticks
+    double convertIT(double distance){
+        return distance / wheelCircumference;
+    }
+
+    // Ticks to Inches
+    double convertTI(double ticks){
+        return ticks * wheelCircumference;
+    }
+
+    void path(double targetDistance){
+
         /*
         if not at target
         target - current position
