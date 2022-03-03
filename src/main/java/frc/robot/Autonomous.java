@@ -27,10 +27,10 @@ public class Autonomous {
     private double wheelCircumference = Math.pow((Math.PI*2), 2);
     private double distance;
     private double setPoint;
-    private double max = 10;
+    private double max = 1000;
     private double min = 0;
 
-    private double kP = 0;
+    private double kP = 0.00001;
     private double kI = 0;
     private double kD = 0;
 
@@ -39,6 +39,10 @@ public class Autonomous {
 
     private RelativeEncoder leftEncoder;
     private RelativeEncoder rightEncoder;
+
+    private double maxSpeed = 1;
+    private double minSpeed = -1;
+    private double zRotation = 0;
 
 
 
@@ -110,7 +114,7 @@ public class Autonomous {
     void positionPIDCalc(double target){
         // PID for both sides
         leftPIDController.setReference(target, ControlType.kPosition);
-        rightPIDController.setReference(target, ControlType.kPosition);
+        rightPIDController.setReference(-target, ControlType.kPosition);
     }
 
     void run(double targetPosition){
@@ -119,9 +123,17 @@ public class Autonomous {
 
         */
 
-        setPoint = convertIT(targetPosition);
-        double revs = setPoint / leftEncoder.getCountsPerRevolution();
-        positionPIDCalc(revs);
+        setPoint = convertIT(targetPosition); // returns converted value from inches(targetPosition) to encoder ticks(setPpoint)
+
+        if (calcTicks(leftEncoder) < setPoint || calcTicks(rightEncoder) < setPoint){
+            // Averaging left and right revolution counts
+            double leftRevs = setPoint / leftEncoder.getCountsPerRevolution();
+            double rightRevs = setPoint / rightEncoder.getCountsPerRevolution();
+            double averageRevs = (leftRevs + rightRevs) / 2;
+
+            positionPIDCalc(averageRevs);
+            drivetrain.drivePidTank(maxSpeed, zRotation);
+        }
     }
     
 }
