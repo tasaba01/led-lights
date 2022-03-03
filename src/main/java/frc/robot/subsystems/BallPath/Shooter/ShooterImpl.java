@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import ca.team3161.lib.utils.Utils;
 import edu.wpi.first.math.controller.PIDController;
@@ -176,5 +177,22 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     public void stopMotors(){
         System.out.println("DISABLING THE SHOOTER");
         setShotPosition(ShotPosition.NONE);
+    }
+
+    @Override
+    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
+        switch (current) {
+            case ON_INIT:
+            case ON_AUTO:
+            case ON_TELEOP:
+            case ON_TEST:
+                this.start();
+                break;
+            case ON_DISABLED:
+            case NONE:
+            default:
+                this.cancel();
+                break;
+        }
     }
 }
