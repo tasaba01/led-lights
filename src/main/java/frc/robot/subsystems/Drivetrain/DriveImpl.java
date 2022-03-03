@@ -10,7 +10,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import ca.team3161.lib.robot.LifecycleEvent;
 // import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+// import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 // import edu.wpi.first.wpilibj.Encoder;
 // import edu.wpi.first.math.controller.PIDController;
@@ -22,13 +22,13 @@ import edu.wpi.first.math.Pair;
 public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // motor controller groups
-    private CANSparkMax leftSide;
-    private CANSparkMax rightSide;
+    public CANSparkMax leftSide;
+    public CANSparkMax rightSide;
 
     // encoder
     
-    private final RelativeEncoder leftEncoder;
-    private final RelativeEncoder rightEncoder;
+    public final RelativeEncoder leftEncoder;
+    public final RelativeEncoder rightEncoder;
 
     // PID controller values
 
@@ -61,7 +61,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         // PID controller impl
         this.leftPIDController = leftSide.getPIDController();
         this.rightPIDController = rightSide.getPIDController();
-        //this.leftPIDController = new PIDController(k, ki, kd);
+        //this.leftPIDController = new PIDController(kp, ki, kd);
         //this.rightPIDController = new PIDController(kp, ki, kd);
 
         leftPIDController.setP(kP);
