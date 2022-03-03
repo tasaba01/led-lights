@@ -102,5 +102,19 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
     }
 
     @Override
-    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {}
+    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
+        switch (current) {
+            case ON_INIT:
+            case ON_AUTO:
+            case ON_TELEOP:
+            case ON_TEST:
+                this.start();
+                break;
+            case ON_DISABLED:
+            case NONE:
+            default:
+                this.cancel();
+                break;
+        }
+    }
 }

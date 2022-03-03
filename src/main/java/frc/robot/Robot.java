@@ -52,7 +52,7 @@ public class Robot extends TitanBot {
   private LogitechDualAction operatorPad;
   private BallPath ballSubsystem;
   private Climber climberSubsystem;
-  private Shooter shooterSubsystem;
+  private Shooter shooter;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
 
   @Override
@@ -118,8 +118,8 @@ public class Robot extends TitanBot {
     TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
     TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
     TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
-    this.shooterSubsystem = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
-    this.ballSubsystem = new BallPathImpl(intake, elevator, shooterSubsystem);
+    this.shooter = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
+    this.ballSubsystem = new BallPathImpl(intake, elevator, shooter);
 
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
@@ -131,6 +131,9 @@ public class Robot extends TitanBot {
     registerLifecycleComponent(driverPad);
     registerLifecycleComponent(drive);
     registerLifecycleComponent(ballSubsystem);
+    registerLifecycleComponent(intake);
+    registerLifecycleComponent(elevator);
+    registerLifecycleComponent(shooter);
   }
 
   /**
@@ -182,14 +185,13 @@ public class Robot extends TitanBot {
     this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(mode));
     this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, mode);
 
-    
-    this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
-    this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
-    this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
+    // this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
+    // this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
+    // this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
 
     // this.driverPad.bind(ControllerBindings.SPIN_UP, PressType.PRESS, () -> this.ballSubsystem.readyToShoot());
-    this.driverPad.bind(ControllerBindings.SHOOT, PressType.PRESS, () -> this.ballSubsystem.startShooter());
-    this.driverPad.bind(ControllerBindings.SHOOT, PressType.RELEASE, () -> this.ballSubsystem.stopShooter());
+    // this.driverPad.bind(ControllerBindings.SHOOT, PressType.PRESS, () -> this.ballSubsystem.startShooter());
+    // this.driverPad.bind(ControllerBindings.SHOOT, PressType.RELEASE, () -> this.ballSubsystem.stopShooter());
 
 
     this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.climberSubsystem.extendOuterClimber());
@@ -198,17 +200,15 @@ public class Robot extends TitanBot {
 
     this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
       if (pressed) {
-        this.shooterSubsystem.setShotPosition(ShotPosition.LAUNCHPAD_FAR);
+        this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_FAR);
       } else {
-        this.shooterSubsystem.setShotPosition(ShotPosition.NONE);
+        this.shooter.setShotPosition(ShotPosition.NONE);
       }
     });
-    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.PRESS, () -> this.shooterSubsystem.setShotPosition(ShotPosition.FENDER));
-    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.RELEASE, () -> this.shooterSubsystem.setShotPosition(ShotPosition.NONE));
+    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
+    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
   }
-
-  
 
   /** This function is called periodically during operator control. */
   @Override
@@ -240,5 +240,4 @@ public class Robot extends TitanBot {
   @Override
   public void testRoutine() {}
 
-  
 }

@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import edu.wpi.first.wpilibj.Ultrasonic;
 
@@ -89,5 +90,22 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
         }
 
         lastPresent = ballPresent;
+    }
+
+    @Override
+    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
+        switch (current) {
+            case ON_INIT:
+            case ON_AUTO:
+            case ON_TELEOP:
+            case ON_TEST:
+                this.start();
+                break;
+            case ON_DISABLED:
+            case NONE:
+            default:
+                this.cancel();
+                break;
+        }
     }
 }
