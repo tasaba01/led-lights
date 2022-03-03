@@ -34,8 +34,6 @@ import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.DriveImpl;
 
-import frc.robot.Autonomous;
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot

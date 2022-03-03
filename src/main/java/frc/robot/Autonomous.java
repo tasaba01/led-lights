@@ -47,7 +47,7 @@ public class Autonomous {
     private RelativeEncoder rightEncoder;
 
     private double maxSpeed = 1;
-    private double minSpeed = -1;
+    // private double minSpeed = -1;
     private double zRotation = 0;
 
 
@@ -64,6 +64,14 @@ public class Autonomous {
         this.rightEncoder = drivetrain.getEncoder(0);
         this.leftPIDController = drivetrain.getController(1).getPIDController();
         this.rightPIDController = drivetrain.getController(0).getPIDController();
+
+        leftPIDController.setP(kP);
+        leftPIDController.setI(kI);
+        leftPIDController.setD(kD);
+
+        rightPIDController.setP(kP);
+        rightPIDController.setI(kI);
+        rightPIDController.setD(kD);
 
 
         leftPIDController.setOutputRange(min, max);
@@ -146,11 +154,13 @@ public class Autonomous {
         double rightRevs = setPoint / rightEncoder.getCountsPerRevolution();
         double averageRevs = (leftRevs + rightRevs) / 2;
 
-        if (calcTicks(leftEncoder) < setPoint || calcTicks(rightEncoder) < setPoint){
+        positionPIDCalc(averageRevs);
 
-            positionPIDCalc(averageRevs);
+        if (calcTicks(leftEncoder) < setPoint || calcTicks(rightEncoder) < setPoint){
             drivetrain.drivePidTank(maxSpeed, zRotation);
-        } 
+        } else {
+            drivetrain.drivePidTank(0, zRotation);
+        }
 
         
         
