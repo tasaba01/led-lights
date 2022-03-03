@@ -41,7 +41,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
     @Override
     public void task() {
         boolean intakeLoaded = intake.ballPrimed();
-        boolean elevatorLoaded = intake.ballPrimed();
+        boolean elevatorLoaded = elevator.ballPrimed();
 
         boolean robotEmpty = !intakeLoaded && !elevatorLoaded;
         boolean elevatorOnly = elevatorLoaded && !intakeLoaded;
