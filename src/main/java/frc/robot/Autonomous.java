@@ -4,15 +4,21 @@ import com.revrobotics.RelativeEncoder;
 // import com.revrobotics.SparkMaxRelativeEncoder;
 
 // SUBSYSTEM IMPORTS
-import frc.robot.subsystems.BallPath.Elevator.Elevator;
-import frc.robot.subsystems.BallPath.Intake.Intake;
-import frc.robot.subsystems.BallPath.Shooter.Shooter;
+// import frc.robot.subsystems.BallPath.Elevator.Elevator;
+// import frc.robot.subsystems.BallPath.Intake.Intake;
+// import frc.robot.subsystems.BallPath.Shooter.Shooter;
+// import frc.robot.subsystems.BallPath.BallPath;
+import frc.robot.subsystems.BallPath.BallPath.BallAction;
+// import frc.robot.subsystems.BallPath.Elevator.Elevator;
+import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
 import frc.robot.subsystems.BallPath.BallPathImpl;
 // import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.DriveImpl;
 
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+
+// import edu.wpi.first.math.controller.PIDController;
 
 // import java.util.concurrent.TimeUnit;
 // import ca.team3161.lib.robot.TitanBot;
@@ -48,16 +54,16 @@ public class Autonomous {
 
 
 
-    public Autonomous(DriveImpl drivetrain, Shooter shooter, Intake intake, Elevator elevator){
+    public Autonomous(DriveImpl drivetrain, BallPathImpl ballPath){
         this.drivetrain = drivetrain;
-        this.ballPath = new BallPathImpl(intake, elevator, shooter);
+        this.ballPath = ballPath;
         this.distance = 0;
         this.setPoint = 0;
 
-        this.leftEncoder = drivetrain.leftEncoder;
-        this.rightEncoder = drivetrain.rightEncoder;
-        this.leftPIDController = drivetrain.leftSide.getPIDController();
-        this.rightPIDController = drivetrain.rightSide.getPIDController();
+        this.leftEncoder = drivetrain.getEncoder(1);
+        this.rightEncoder = drivetrain.getEncoder(0);
+        this.leftPIDController = drivetrain.getController(1).getPIDController();
+        this.rightPIDController = drivetrain.getController(0).getPIDController();
 
 
         leftPIDController.setOutputRange(min, max);
@@ -72,6 +78,10 @@ public class Autonomous {
         distance = calcTicks(encoder) * wheelCircumference;
 
         return distance;
+    }
+
+    double calcDistance(double ticks){
+        return ticks * wheelCircumference;
     }
 
     double calcTicks(RelativeEncoder encoder){
@@ -117,23 +127,46 @@ public class Autonomous {
         rightPIDController.setReference(-target, ControlType.kPosition);
     }
 
-    void run(double targetPosition){
+    public double run(double targetPosition){
         /*
         :targetPosition: distance to be driven in inches -> double
-
         */
+
+        ballPath.setAction(BallAction.FEED);
 
         setPoint = convertIT(targetPosition); // returns converted value from inches(targetPosition) to encoder ticks(setPpoint)
 
+        boolean intakeLoaded = ballPath.intake.ballPrimed();
+        boolean elevatorLoaded = ballPath.elevator.ballPrimed();
+        boolean robotFull = intakeLoaded && elevatorLoaded;
+        // boolean elevatorOnly = !intakeLoaded && elevatorLoaded;
+
+        // Averaging left and right revolution counts
+        double leftRevs = setPoint / leftEncoder.getCountsPerRevolution();
+        double rightRevs = setPoint / rightEncoder.getCountsPerRevolution();
+        double averageRevs = (leftRevs + rightRevs) / 2;
+
         if (calcTicks(leftEncoder) < setPoint || calcTicks(rightEncoder) < setPoint){
-            // Averaging left and right revolution counts
-            double leftRevs = setPoint / leftEncoder.getCountsPerRevolution();
-            double rightRevs = setPoint / rightEncoder.getCountsPerRevolution();
-            double averageRevs = (leftRevs + rightRevs) / 2;
 
             positionPIDCalc(averageRevs);
             drivetrain.drivePidTank(maxSpeed, zRotation);
+        } 
+
+        
+        
+        if(robotFull){
+            ballPath.setAction(BallAction.SHOOT);
+            ballPath.shooter.setShotPosition(ShotPosition.AUTO);
         }
+
+        double leftPosition = leftEncoder.getPosition();
+        double rightPosition = rightEncoder.getPosition();
+        double averagePos = (leftPosition + rightPosition) / 2;
+
+        ballPath.setAction(BallAction.NONE);
+        ballPath.shooter.setShotPosition(ShotPosition.NONE);
+
+        return targetPosition - this.calcDistance(averagePos);
     }
     
 }

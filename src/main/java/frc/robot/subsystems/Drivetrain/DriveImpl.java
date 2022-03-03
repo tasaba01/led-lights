@@ -22,13 +22,13 @@ import edu.wpi.first.math.Pair;
 public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // motor controller groups
-    public CANSparkMax leftSide;
-    public CANSparkMax rightSide;
+    private CANSparkMax leftSide;
+    private CANSparkMax rightSide;
 
     // encoder
     
-    public final RelativeEncoder leftEncoder;
-    public final RelativeEncoder rightEncoder;
+    private final RelativeEncoder leftEncoder;
+    private final RelativeEncoder rightEncoder;
 
     // PID controller values
 
@@ -219,6 +219,38 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         
         //this.drivetrain.tankDrive(this.leftPIDController.calculate(this.leftEncoder.getVelocity(), ), this.rightPIDController.calculate(this.rightEncoder.getVelocity()));
         
+    }
+
+    @Override
+    public CANSparkMax getController(int side){
+      /*
+      :side: motor controller side(left=1, right=0) -> int
+      :return: requested motor controller
+      :rtype: CANSparkMax
+      */
+      if (side == 1){
+        return this.leftSide;
+      } else if (side == 0){
+        return this.rightSide;
+      } else {
+        return this.leftSide;
+      }
+    }
+
+    @Override
+    public RelativeEncoder getEncoder(int side){
+      /*
+      :side: Encoder side(left=1, right=0) -> int
+      :return: requested encoder
+      :rtype: RelativeEncoder
+      */
+      if (side == 1){
+        return this.leftEncoder;
+      } else if (side == 0){
+        return this.rightEncoder;
+      } else {
+        return this.leftEncoder;
+      }
     }
 
     @Override

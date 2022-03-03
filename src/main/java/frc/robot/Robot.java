@@ -34,6 +34,8 @@ import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.DriveImpl;
 
+import frc.robot.Autonomous;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -53,6 +55,8 @@ public class Robot extends TitanBot {
   private BallPath ballSubsystem;
   private Climber climberSubsystem;
   private Shooter shooter;
+
+  private Autonomous auto;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
 
   @Override
@@ -161,14 +165,22 @@ public class Robot extends TitanBot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    auto = new Autonomous((DriveImpl) this.drive, (BallPathImpl) this.ballSubsystem);
   }
 
-  /** This function is called periodically during autonomous. */
+  /** This function is called periodically during autonomous. 
+   * @throws InterruptedException
+   * */
   @Override
-  public void autonomousRoutine() {
+  public void autonomousRoutine() throws InterruptedException {
     switch (m_autoSelected) {
       case kCustomAuto:
-        
+      double autoDistance = 59; // distances in inches(about 1.5m) | will be changed
+        while(autoDistance > 0){
+          autoDistance = auto.run(autoDistance); // Run cycle(drive, intake, elevator, shooter)
+          Thread.sleep(100);
+        }
         break;
       case kDefaultAuto:
       default:
