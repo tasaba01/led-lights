@@ -73,7 +73,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 break;
             case SHOOT:
                 if (robotEmpty) {
-                    elevator.setAction(ElevatorAction.NONE);
+                    elevator.setAction(ElevatorAction.FEED);
                     intake.setAction(IntakeAction.NONE);
                     shooter.setShotPosition(ShotPosition.NONE);
                 }
