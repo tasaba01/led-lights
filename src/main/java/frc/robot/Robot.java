@@ -4,20 +4,23 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+
 import ca.team3161.lib.robot.TitanBot;
-// import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.utils.controls.DeadbandJoystickMode;
+import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.InvertedJoystickMode;
 import ca.team3161.lib.utils.controls.JoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.SquaredJoystickMode;
-import ca.team3161.lib.utils.controls.Gamepad.PressType;
-// import edu.wpi.first.wpilibj.Encoder;
-// import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.Drivetrain.Drive;
-import frc.robot.subsystems.Drivetrain.DriveImpl;
 import frc.robot.subsystems.BallPath.BallPath;
 import frc.robot.subsystems.BallPath.BallPathImpl;
 import frc.robot.subsystems.BallPath.Elevator.Elevator;
@@ -26,26 +29,11 @@ import frc.robot.subsystems.BallPath.Intake.Intake;
 import frc.robot.subsystems.BallPath.Intake.IntakeImpl;
 import frc.robot.subsystems.BallPath.Shooter.Shooter;
 import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
+import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
 import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.Climber.ClimberImpl;
+import frc.robot.subsystems.Drivetrain.Drive;
+import frc.robot.subsystems.Drivetrain.DriveImpl;
 
-// Spark Max Imports (Drive Train)
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-
-
-// Intake Imports
-import com.revrobotics.ColorSensorV3;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-import edu.wpi.first.wpilibj.Ultrasonic;
-
-// AUTONOMOUS IMPORT
-import frc.robot.Autonomous;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -61,8 +49,10 @@ public class Robot extends TitanBot {
 
   private Drive drive;
   private LogitechDualAction driverPad;
+  private LogitechDualAction operatorPad;
   private BallPath ballSubsystem;
   private Climber climberSubsystem;
+  private Shooter shooter;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
 
   @Override
@@ -113,31 +103,37 @@ public class Robot extends TitanBot {
     this.drive = new DriveImpl(leftControllerPrimary, rightControllerPrimary, leftEncoderPrimary, rightEncoderPrimary);
 
     // INTAKE COMPONENTS
-    // WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
+    WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
     //ColorSensorV3 leftColorSensor = new ColorSensorV3(RobotMap.LEFT_COLOR_SENSOR_PORT);
     //ColorSensorV3 rightColorSensor = new ColorSensorV3(RobotMap.RIGHT_COLOR_SENSOR_PORT);
-    //Ultrasonic intakeSensor = new Ultrasonic(RobotMap.INTAKE_ULTRASONIC_PORTS[0], RobotMap.INTAKE_ULTRASONIC_PORTS[1]);
-    // Intake intake = new IntakeImpl(intakeMotorController, leftColorSensor, rightColorSensor, intakeSensor);
-    
+    Ultrasonic intakeSensor = new Ultrasonic(RobotMap.INTAKE_ULTRASONIC_PORTS[0], RobotMap.INTAKE_ULTRASONIC_PORTS[1]);
+    Intake intake = new IntakeImpl(intakeMotorController, intakeSensor);
+
     // ELEVATOR COMPONENTS
-    // WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
-    // Elevator elevator = new ElevatorImpl(elevatorMotorController);
+    WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
+    Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
+    Elevator elevator = new ElevatorImpl(elevatorMotorController, elevatorSensor);
 
     // SHOOTER COMPONENTS
-    // Shooter shooter = new ShooterImpl();
+    TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
+    TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
+    TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
+    this.shooter = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
+    this.ballSubsystem = new BallPathImpl(intake, elevator, shooter);
 
-    // // ELEVATOR SENSOR
-    // Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
-    
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
-    //this.ballSubsystem = new BallPathImpl(intake, elevator, shooter, elevatorSensor);
+    this.operatorPad = new LogitechDualAction(RobotMap.OPERATOR_PAD_PORT);
+
     //this.climberSubsystem = new ClimberImpl();
 
     // register lifecycle components
     registerLifecycleComponent(driverPad);
     registerLifecycleComponent(drive);
-    //registerLifecycleComponent(ballSubsystem);
+    registerLifecycleComponent(ballSubsystem);
+    registerLifecycleComponent(intake);
+    registerLifecycleComponent(elevator);
+    registerLifecycleComponent(shooter);
   }
 
   /**
@@ -189,23 +185,30 @@ public class Robot extends TitanBot {
     this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(mode));
     this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, mode);
 
-    
-    this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
-    this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
-    this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
+    // this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
+    // this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
+    // this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
 
-    this.driverPad.bind(ControllerBindings.SPIN_UP, PressType.PRESS, () -> this.ballSubsystem.readyToShoot());
-    this.driverPad.bind(ControllerBindings.SHOOT, PressType.PRESS, () -> this.ballSubsystem.startShooter());
-    this.driverPad.bind(ControllerBindings.SHOOT, PressType.RELEASE, () -> this.ballSubsystem.stopShooter());
+    // this.driverPad.bind(ControllerBindings.SPIN_UP, PressType.PRESS, () -> this.ballSubsystem.readyToShoot());
+    // this.driverPad.bind(ControllerBindings.SHOOT, PressType.PRESS, () -> this.ballSubsystem.startShooter());
+    // this.driverPad.bind(ControllerBindings.SHOOT, PressType.RELEASE, () -> this.ballSubsystem.stopShooter());
 
 
     this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.climberSubsystem.extendOuterClimber());
     this.driverPad.bind(ControllerBindings.CLIMBER_RETRACT, PressType.PRESS, () -> this.climberSubsystem.retractOuterClimber());
     this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
 
-  }
+    this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
+      if (pressed) {
+        this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_FAR);
+      } else {
+        this.shooter.setShotPosition(ShotPosition.NONE);
+      }
+    });
+    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
+    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-  
+  }
 
   /** This function is called periodically during operator control. */
   @Override
@@ -237,5 +240,4 @@ public class Robot extends TitanBot {
   @Override
   public void testRoutine() {}
 
-  
 }

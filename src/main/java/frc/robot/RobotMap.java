@@ -29,4 +29,8 @@ public final class RobotMap {
     public static final int LIFTER_TALON_PORT = 0;
     //public static final int[] CLIMBER_SOLENOID_CHANNELS = {0,0};
 
+    public static final int SHOOTER_PORT = 1;
+    public static final int TURRET_PORT = 3;
+    public static final int HOOD_PORT = 4;
+
 }

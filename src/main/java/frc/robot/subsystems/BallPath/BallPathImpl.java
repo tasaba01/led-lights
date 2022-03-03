@@ -4,119 +4,117 @@ import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
-
-import frc.robot.subsystems.BallPath.Intake.Intake;
 import frc.robot.subsystems.BallPath.Elevator.Elevator;
+import frc.robot.subsystems.BallPath.Elevator.Elevator.ElevatorAction;
+import frc.robot.subsystems.BallPath.Intake.Intake;
+import frc.robot.subsystems.BallPath.Intake.Intake.IntakeAction;
 import frc.robot.subsystems.BallPath.Shooter.Shooter;
-import edu.wpi.first.wpilibj.Ultrasonic;
+import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
 
 public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
     private final Intake intake;
     private final Elevator elevator;
-    private final Ultrasonic elevatorSensor;
     private final Shooter shooter;
-    private String action;
 
-    private long intakeStartedTime = -1;
+    private BallAction action = BallAction.NONE;
 
-    public BallPathImpl(Intake intake, Elevator elevator, Shooter shooter, Ultrasonic elevatorSensor) {
+    public BallPathImpl(Intake intake, Elevator elevator, Shooter shooter) {
         super(20, TimeUnit.MILLISECONDS);
         this.intake = intake;
         this.elevator = elevator;
-        this.elevatorSensor = elevatorSensor;
         this.shooter = shooter;
-        this.action = "IDLE";
     }
 
     @Override
-    public void defineResources(){}
+    public void defineResources(){
+        require(intake);
+        require(elevator);
+        require(shooter);
+    }
 
     @Override
-    public void task(){
-        if (this.action.equals("START_INTAKE")){
-            if (this.intake.checkColour() && !this.checkIfPrimed()){ 
-                long now = System.nanoTime(); // current unix timestamp in nanoseconds 
-                if (this.intakeStartedTime < 0) { 
-                    this.intakeStartedTime = now; 
-                } 
-                this.intake.start(); 
-                if (now > this.intakeStartedTime + TimeUnit.SECONDS.toNanos(3)) { 
-                    this.intake.stop(); 
-                    this.intakeStartedTime = -1; 
-                    // we have completed this action and don't want to repeat it all over again, 
-                    // so maybe we do this too: 
-                    this.action = "IDLE"; 
-                } 
-            }
+    public void setAction(BallAction action) {
+        this.action = action;
+    }
+
+    @Override
+    public void task() {
+        boolean intakeLoaded = intake.ballPrimed();
+        boolean elevatorLoaded = intake.ballPrimed();
+
+        boolean robotEmpty = !intakeLoaded && !elevatorLoaded;
+        boolean elevatorOnly = elevatorLoaded && !intakeLoaded;
+        boolean intakeOnly = intakeLoaded && !elevatorLoaded;
+        boolean full = intakeLoaded && elevatorLoaded;
+
+        switch (action) {
+            case FEED:
+                if (robotEmpty) {
+                    intake.setAction(IntakeAction.FEED);
+                    elevator.setAction(ElevatorAction.FEED);
+                    shooter.setShotPosition(ShotPosition.NONE);
+                }
+                if (elevatorOnly) {
+                    elevator.setAction(ElevatorAction.NONE);
+                    intake.setAction(IntakeAction.FEED);
+                    shooter.setShotPosition(ShotPosition.NONE);
+                }
+                if (intakeOnly) {
+                    elevator.setAction(ElevatorAction.FEED);
+                    intake.setAction(IntakeAction.PRIME);
+                    shooter.setShotPosition(ShotPosition.NONE);
+                }
+                if (full) {
+                    elevator.setAction(ElevatorAction.NONE);
+                    intake.setAction(IntakeAction.NONE);
+                    shooter.setShotPosition(ShotPosition.NONE);
+                }
+                break;
+            case SHOOT:
+                if (robotEmpty) {
+                    elevator.setAction(ElevatorAction.NONE);
+                    intake.setAction(IntakeAction.NONE);
+                    shooter.setShotPosition(ShotPosition.NONE);
+                }
+                if (elevatorOnly) {
+                    if (shooter.readyToShoot()) {
+                        elevator.setAction(ElevatorAction.PRIME);
+                    }
+                    intake.setAction(IntakeAction.NONE);
+                }
+                if (intakeOnly) {
+                    elevator.setAction(ElevatorAction.PRIME);
+                    intake.setAction(IntakeAction.PRIME);
+                }
+                if (full) {
+                    elevator.setAction(ElevatorAction.PRIME);
+                    intake.setAction(IntakeAction.PRIME);
+                }
+                break;
+            case NONE:
+            default:
+                intake.setAction(IntakeAction.NONE);
+                elevator.setAction(ElevatorAction.NONE);
+                shooter.setShotPosition(ShotPosition.NONE);
+                break;
         }
     }
 
-    // Declare interface with team
     @Override
-    public void startIntake(){
-        this.intake.start();
-        this.action = "START_INTAKE";
-    }
-
-    @Override
-    public void reverseIntake(){
-        this.intake.reverse();
-    }
-
-    @Override
-    public void stopIntake(){
-        this.intake.stop();
-    }
-
-    @Override
-    public boolean checkIfPrimed(){
-        // if (ballUnderElevator){
-        //     return true;
-        // }
-        if (this.elevatorSensor.getRangeInches() <= 4 ){
-            return true;
+    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
+        switch (current) {
+            case ON_INIT:
+            case ON_AUTO:
+            case ON_TELEOP:
+            case ON_TEST:
+                this.start();
+                break;
+            case ON_DISABLED:
+            case NONE:
+            default:
+                this.cancel();
+                break;
         }
-        return false;
     }
-
-    @Override
-    public void startElevator(){
-        this.elevator.start();
-    }
-    
-    // can be used to stop a ball from going up the elevator in the event that we cannot shoot the ball
-    @Override
-    public void reverseElevator(){
-        this.elevator.reverse();
-    }
-
-    @Override
-    public void stopElevator(){
-        this.elevator.stop();
-    }
-
-    @Override
-    public void findAndCenterTarget(){
-        this.shooter.findAndCenterTarget();
-    }
-
-    @Override
-    public boolean readyToShoot(){
-        return this.shooter.readyToShoot();
-    }
-
-    @Override
-    public void startShooter(){
-        this.shooter.start();
-    }
-
-    @Override
-    public void stopShooter(){
-        this.shooter.stop();
-    }
-        
-    @Override
-    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {}
-   
 }

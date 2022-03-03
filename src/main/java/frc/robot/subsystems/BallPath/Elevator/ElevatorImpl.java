@@ -1,31 +1,111 @@
 package frc.robot.subsystems.BallPath.Elevator;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
-
-import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
-    public final WPI_TalonSRX elevator;
+import ca.team3161.lib.robot.LifecycleEvent;
+import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
+import edu.wpi.first.wpilibj.Ultrasonic;
 
-    public ElevatorImpl(WPI_TalonSRX elevator) {
+public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
+
+    private static final double MOTOR_SPEED = 0.75;
+    private static final double PRIMED_DIST_THRESHOLD = 2;
+    private static final int SAMPLE_COUNT = 1;
+
+    private final WPI_TalonSRX elevator;
+    private final Ultrasonic sensor;
+
+    private ElevatorAction action = ElevatorAction.NONE;
+    private boolean lastPresent = false;
+    private final Queue<Double> sensorSamples;
+
+    public ElevatorImpl(WPI_TalonSRX elevator, Ultrasonic sensor) {
         super(20, TimeUnit.MILLISECONDS);
         this.elevator = elevator;
+        this.sensor = sensor;
+        this.sensorSamples = new ArrayDeque<>();
     }
 
     @Override
-    public void start(){}
+    public void defineResources() {
+        require(elevator);
+        require(sensor);
+    }
 
     @Override
-    public void reverse(){}
+    public void setAction(ElevatorAction action) {
+        this.action = action;
+    }
 
     @Override
-    public void stop(){}
-    // can be used to stop a ball from going up the elevator in the event that we cannot shoot the ball
+    public boolean ballPrimed() {
+        return lastPresent;
+    }
 
     @Override
-    public void defineResources() {}
+    public void task() throws Exception {
+        double sensorReading = this.sensor.getRangeInches();
+        this.sensorSamples.add(sensorReading);
+        if (sensorSamples.size() > SAMPLE_COUNT) {
+            this.sensorSamples.remove();
+        }
+        double meanReading = 0;
+        for (Double d : sensorSamples) {
+            meanReading += d / sensorSamples.size();
+        }
 
-    public void task(){}
+        boolean ballPresent = meanReading < PRIMED_DIST_THRESHOLD;
+        // boolean stateChanged = ballPresent != lastPresent;
+
+        switch (action) {
+            case FEED:
+                if (ballPresent) {
+                    this.elevator.stopMotor();
+                } else {
+                    this.elevator.set(MOTOR_SPEED);
+                }
+                break;
+            case PRIME:
+                if (ballPresent) {
+                    this.elevator.set(MOTOR_SPEED);
+                } else {
+                    this.elevator.stopMotor();
+                }
+                break;
+            case REJECT:
+                if (ballPresent) {
+                    this.elevator.set(-MOTOR_SPEED);
+                } else {
+                    this.elevator.stopMotor();
+                }
+                break;
+            case NONE:
+            default:
+                elevator.stopMotor();
+                break;
+        }
+
+        lastPresent = ballPresent;
+    }
+
+    @Override
+    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
+        switch (current) {
+            case ON_INIT:
+            case ON_AUTO:
+            case ON_TELEOP:
+            case ON_TEST:
+                this.start();
+                break;
+            case ON_DISABLED:
+            case NONE:
+            default:
+                this.cancel();
+                break;
+        }
+    }
 }
