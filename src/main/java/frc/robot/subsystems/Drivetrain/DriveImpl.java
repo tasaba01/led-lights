@@ -33,11 +33,11 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // PID controller values
 
-    private double kP = 0.000750; 
+    private double kP = 0.0001; 
     private double kI = 0;
-    private double kD = 0.000100; 
+    private double kD = 0.0000; 
     private double kIz = 0; 
-    private double kFF = 0; 
+    private double kFF = 0.000003; 
     private double kMaxOutput = 1; 
     private double kMinOutput = -1;
     private double maxRPM = 5200;
@@ -46,7 +46,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     
     private final SparkMaxPIDController leftPIDController;
     private final SparkMaxPIDController rightPIDController;
-    private DifferentialDrive drivetrain;
+    // private DifferentialDrive drivetrain;
 
 
     public DriveImpl(CANSparkMax leftSide, CANSparkMax rightSide, RelativeEncoder leftEncoder, RelativeEncoder rightEncoder) {
@@ -54,7 +54,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         // basic drivetrain stuff
         this.leftSide = leftSide;
         this.rightSide = rightSide;
-        this.drivetrain = new DifferentialDrive(leftSide, rightSide);
+        // this.drivetrain = new DifferentialDrive(leftSide, rightSide);
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder; 
 
@@ -107,14 +107,14 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     @Override
     public void driveTank(double leftSpeed, double rightSpeed) {
-        this.drivetrain.tankDrive(leftSpeed, rightSpeed);
+        // this.drivetrain.tankDrive(leftSpeed, rightSpeed);
         SmartDashboard.putNumber("Left Encoder Velocity", leftEncoder.getVelocity());
         SmartDashboard.putNumber("Right Encoder Velocity", rightEncoder.getVelocity());
     }
 
     @Override
     public void driveArcade(double speed, double rotation) {
-        this.drivetrain.arcadeDrive(speed, rotation);
+        // this.drivetrain.arcadeDrive(speed, rotation);
     }
 
     public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {

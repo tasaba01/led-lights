@@ -26,6 +26,7 @@ import frc.robot.subsystems.BallPath.Intake.Intake;
 import frc.robot.subsystems.BallPath.Intake.IntakeImpl;
 import frc.robot.subsystems.BallPath.Shooter.Shooter;
 import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
+import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberImpl;
 
@@ -63,8 +64,10 @@ public class Robot extends TitanBot {
 
   private Drive drive;
   private LogitechDualAction driverPad;
+  private LogitechDualAction operatorPad;
   private BallPath ballSubsystem;
   private Climber climberSubsystem;
+  private Shooter shooterSubsystem;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
 
   @Override
@@ -126,17 +129,18 @@ public class Robot extends TitanBot {
     // Elevator elevator = new ElevatorImpl(elevatorMotorController);
 
     // SHOOTER COMPONENTS
-    // TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
-    // TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
-    // TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
-    // Shooter shooter = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
+    TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
+    TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
+    TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
+    this.shooterSubsystem = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
 
     // // ELEVATOR SENSOR
     // Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
     
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
-    //this.ballSubsystem = new BallPathImpl(intake, elevator, shooter, elevatorSensor);
+    this.operatorPad = new LogitechDualAction(RobotMap.OPERATOR_PAD_PORT);
+    // this.ballSubsystem = new BallPathImpl(intake, elevator, shooter, elevatorSensor);
     //this.climberSubsystem = new ClimberImpl();
 
     // register lifecycle components
@@ -199,7 +203,7 @@ public class Robot extends TitanBot {
     this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
     this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
 
-    this.driverPad.bind(ControllerBindings.SPIN_UP, PressType.PRESS, () -> this.ballSubsystem.readyToShoot());
+    // this.driverPad.bind(ControllerBindings.SPIN_UP, PressType.PRESS, () -> this.ballSubsystem.readyToShoot());
     this.driverPad.bind(ControllerBindings.SHOOT, PressType.PRESS, () -> this.ballSubsystem.startShooter());
     this.driverPad.bind(ControllerBindings.SHOOT, PressType.RELEASE, () -> this.ballSubsystem.stopShooter());
 
@@ -207,6 +211,16 @@ public class Robot extends TitanBot {
     this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.climberSubsystem.extendOuterClimber());
     this.driverPad.bind(ControllerBindings.CLIMBER_RETRACT, PressType.PRESS, () -> this.climberSubsystem.retractOuterClimber());
     this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
+
+    this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
+      if (pressed) {
+        this.shooterSubsystem.setShotPosition(ShotPosition.LAUNCHPAD_FAR);
+      } else {
+        this.shooterSubsystem.setShotPosition(ShotPosition.NONE);
+      }
+    });
+    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.PRESS, () -> this.shooterSubsystem.setShotPosition(ShotPosition.FENDER));
+    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.RELEASE, () -> this.shooterSubsystem.setShotPosition(ShotPosition.NONE));
 
   }
 
