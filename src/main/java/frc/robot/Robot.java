@@ -19,6 +19,7 @@ import ca.team3161.lib.utils.controls.DeadbandJoystickMode;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.InvertedJoystickMode;
 import ca.team3161.lib.utils.controls.JoystickMode;
+import ca.team3161.lib.utils.controls.LinearJoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.SquaredJoystickMode;
 import edu.wpi.first.wpilibj.Ultrasonic;
@@ -81,19 +82,23 @@ public class Robot extends TitanBot {
     CANSparkMax rightControllerPrimary = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[0], MotorType.kBrushless);
     CANSparkMax rightControllerFollower = new CANSparkMax(RobotMap.NEO_RIGHT_DRIVE_PORTS[1], MotorType.kBrushless);
     
+    leftControllerPrimary.restoreFactoryDefaults();
+    leftControllerFollower.restoreFactoryDefaults();
+    rightControllerPrimary.restoreFactoryDefaults();
+    rightControllerFollower.restoreFactoryDefaults();
+    
+    leftControllerFollower.follow(leftControllerPrimary);
+    rightControllerFollower.follow(rightControllerPrimary);
+
+    leftControllerPrimary.setSmartCurrentLimit(35);
+    leftControllerFollower.setSmartCurrentLimit(35);
+    rightControllerPrimary.setSmartCurrentLimit(35);
+    rightControllerFollower.setSmartCurrentLimit(35);
     
     leftControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
     leftControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
     rightControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
     rightControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    
-    leftControllerPrimary.restoreFactoryDefaults();
-    leftControllerFollower.restoreFactoryDefaults();
-    rightControllerPrimary.restoreFactoryDefaults();
-    rightControllerFollower.restoreFactoryDefaults();
-
-    leftControllerFollower.follow(leftControllerPrimary);
-    rightControllerFollower.follow(rightControllerPrimary);
 
     leftControllerPrimary.setInverted(true);
     
@@ -199,10 +204,9 @@ public class Robot extends TitanBot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopSetup() {
-    JoystickMode mode = new DeadbandJoystickMode(0.05).andThen(new SquaredJoystickMode());
-    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(mode));
-    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, mode);
-
+    JoystickMode deadbandMode = new DeadbandJoystickMode(0.05);
+    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(deadbandMode));
+    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, deadbandMode.andThen(x -> x * .6));
     // this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
     // this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
     // this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
@@ -213,17 +217,9 @@ public class Robot extends TitanBot {
 
 
     // this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.climberSubsystem.extendOuterClimber());
-    this.driverPad.bind(ControllerBindings.CLIMBER_RETRACT, PressType.PRESS, () -> this.climberSubsystem.retractOuterClimber());
-    this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
+    // this.driverPad.bind(ControllerBindings.CLIMBER_RETRACT, PressType.PRESS, () -> this.climberSubsystem.retractOuterClimber());
+    // this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
     // this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.ballSubsystem.);
-
-    // this.driverPad.bind(ControllerBindings.INTAKE_START, pressed ->{
-    //   if(pressed){
-    //   this.ballSubsystem.setAction(BallAction.TEST);
-    // // }else{
-    // //   this.ballSubsystem.setAction(BallAction.NONE);
-    // // }
-    // }});
 
     this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.TEST));
     this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));

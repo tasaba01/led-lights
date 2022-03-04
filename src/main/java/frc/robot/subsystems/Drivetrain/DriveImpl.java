@@ -27,14 +27,15 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // PID controller values
 
-    private double kP = 0.00075; 
+    private double kP = 0.00085; 
     private double kI = 0;
     private double kD = 0.0000; 
     private double kIz = 0; 
-    private double kFF = 0.000004; 
+    private double kFF = 0.0000035; 
     private double kMaxOutput = 1; 
     private double kMinOutput = -1;
     private double maxRPM = 5200;
+    private double setpointThreshold = 300;
 
     // PID controllers
     
@@ -65,6 +66,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         leftPIDController.setIZone(kIz);
         leftPIDController.setFF(kFF);
         leftPIDController.setOutputRange(kMinOutput, kMaxOutput);
+        leftPIDController.setSmartMotionAllowedClosedLoopError(setpointThreshold, 0);
 
         rightPIDController.setP(kP);
         rightPIDController.setI(kI);
@@ -72,7 +74,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         rightPIDController.setIZone(kIz);
         rightPIDController.setFF(kFF);
         rightPIDController.setOutputRange(kMinOutput, kMaxOutput);
-
+        rightPIDController.setSmartMotionAllowedClosedLoopError(setpointThreshold, 0);
 
         // display PID coefficients on SmartDashboard
         SmartDashboard.putNumber("P Gain", kP);
@@ -248,6 +250,22 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     }
     
     @Override
-    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {}
+    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
+      switch (current) {
+        case ON_INIT:
+        case ON_AUTO:
+        case ON_TELEOP:
+        case ON_TEST:
+          this.start();
+          break;
+        case ON_DISABLED:
+        case NONE:
+        default:
+          this.leftEncoder.setPosition(0);
+          this.rightEncoder.setPosition(0);
+          this.cancel();
+          break;
+    }
+  }
 
 }
