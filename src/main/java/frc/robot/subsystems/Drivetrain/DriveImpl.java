@@ -2,20 +2,14 @@ package frc.robot.subsystems.Drivetrain;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.namespace.QName;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 
 import ca.team3161.lib.robot.LifecycleEvent;
-// import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
-// import edu.wpi.first.wpilibj.Encoder;
-// import edu.wpi.first.math.controller.PIDController;
-// import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -62,7 +56,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         // PID controller impl
         this.leftPIDController = leftSide.getPIDController();
         this.rightPIDController = rightSide.getPIDController();
-        //this.leftPIDController = new PIDController(k, ki, kd);
+        //this.leftPIDController = new PIDController(kp, ki, kd);
         //this.rightPIDController = new PIDController(kp, ki, kd);
 
         leftPIDController.setP(kP);
@@ -223,6 +217,12 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     }
 
     @Override
+    public Pair<Double, Double> getEncoderTicks(){
+
+      return Pair.of(this.leftEncoder.getPosition(), this.rightEncoder.getPosition());
+    }
+
+    @Override
     public double getHeading() {
         return 0;
     }
@@ -241,11 +241,11 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         return Pair.of(this.leftEncoder.getPosition() , this.rightEncoder.getPosition());
     }
 
-    //public void setSetpoint(double setpoint){
-    //    this.leftPIDController.setSetpoint(setpoint);
-    //    this.rightPIDController.setSetpoint(setpoint);
-    //    
-    //}
+    public void setSetpoint(double leftSetPoint, double rightSetPoint){
+       this.leftPIDController.setReference(leftSetPoint, ControlType.kPosition);
+       this.rightPIDController.setReference(rightSetPoint, ControlType.kPosition);
+       
+    }
     
     @Override
     public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {}

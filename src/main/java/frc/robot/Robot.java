@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.concurrent.TimeUnit;
+
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -53,6 +55,8 @@ public class Robot extends TitanBot {
   private BallPath ballSubsystem;
   private Climber climberSubsystem;
   private Shooter shooter;
+
+  private Autonomous auto;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
 
   @Override
@@ -161,14 +165,27 @@ public class Robot extends TitanBot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    auto = new Autonomous(this.drive, this.ballSubsystem);
   }
 
-  /** This function is called periodically during autonomous. */
+  /** This function is called periodically during autonomous. 
+   * @throws InterruptedException
+   * */
   @Override
-  public void autonomousRoutine() {
+  public void autonomousRoutine() throws InterruptedException {
     switch (m_autoSelected) {
       case kCustomAuto:
-        // Put custom auto code here
+      double autoDistance = 59; // distances in inches(about 1.5m) | will be changed
+      auto.setDriveDistance(autoDistance);
+      boolean doneDriving = false;
+        while(!doneDriving){
+          doneDriving = auto.drive(); // Run cycle(drive, intake, elevator, shooter)
+          // Thread.sleep(100);
+          waitFor(20, TimeUnit.MILLISECONDS);
+          auto.shoot();
+        }
+        auto.stop();
         break;
       case kDefaultAuto:
       default:
@@ -180,7 +197,6 @@ public class Robot extends TitanBot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopSetup() {
-    // TODO Set up bindings
     JoystickMode mode = new DeadbandJoystickMode(0.05).andThen(new SquaredJoystickMode());
     this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(mode));
     this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, mode);

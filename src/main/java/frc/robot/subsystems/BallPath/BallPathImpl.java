@@ -119,4 +119,19 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 break;
         }
     }
+
+    @Override
+    public Intake getIntake(){
+        return this.intake;
+    }
+
+    @Override
+    public Elevator getElevator(){
+        return this.elevator;
+    }
+
+    @Override
+    public Shooter getShooter(){
+        return this.shooter;
+    }
 }

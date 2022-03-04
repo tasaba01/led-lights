@@ -11,7 +11,7 @@ public class ClimberImpl implements Climber {
      
     private long starttime = 0;
 
-    WPI_TalonSRX lifterMotorController;
+    private WPI_TalonSRX lifterMotorController;
     //DoubleSolenoid climberSolenoid;
 
     public ClimberImpl() {
