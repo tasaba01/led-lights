@@ -4,21 +4,16 @@ import com.revrobotics.RelativeEncoder;
 // import com.revrobotics.SparkMaxRelativeEncoder;
 
 // SUBSYSTEM IMPORTS
-// import frc.robot.subsystems.BallPath.Elevator.Elevator;
-// import frc.robot.subsystems.BallPath.Intake.Intake;
-// import frc.robot.subsystems.BallPath.Shooter.Shooter;
-// import frc.robot.subsystems.BallPath.BallPath;
 import frc.robot.subsystems.BallPath.BallPath.BallAction;
-// import frc.robot.subsystems.BallPath.Elevator.Elevator;
 import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
 import frc.robot.subsystems.BallPath.BallPathImpl;
-// import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.DriveImpl;
 
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
+// import com.revrobotics.CANSparkMax.ControlType;
 
-// import edu.wpi.first.math.controller.PIDController;
+
+import edu.wpi.first.math.controller.PIDController;
 
 // import java.util.concurrent.TimeUnit;
 // import ca.team3161.lib.robot.TitanBot;
@@ -46,9 +41,11 @@ public class Autonomous {
     private RelativeEncoder leftEncoder;
     private RelativeEncoder rightEncoder;
 
-    private double maxSpeed = 1;
-    // private double minSpeed = -1;
+    // private double maxSpeed = 1;
     private double zRotation = 0;
+    private double targetDistance;
+
+    private PIDController positionPIDController;
 
 
 
@@ -62,8 +59,9 @@ public class Autonomous {
 
         this.leftEncoder = drivetrain.getEncoder(1);
         this.rightEncoder = drivetrain.getEncoder(0);
-        this.leftPIDController = drivetrain.getController(1).getPIDController();
-        this.rightPIDController = drivetrain.getController(0).getPIDController();
+        this.positionPIDController = new PIDController(kP, kI, kD);
+        // this.leftPIDController = drivetrain.getController(1).getPIDController();
+        // this.rightPIDController = drivetrain.getController(0).getPIDController();
 
         leftPIDController.setP(kP);
         leftPIDController.setI(kI);
@@ -122,61 +120,49 @@ public class Autonomous {
         return ticks * wheelCircumference;
     }
 
-    // double PIDCalc(PIDController pidController){
-    //     double output;
-    //     output = pidController.calculate(this.drivetrain.leftEncoder.getPosition());
-
-    //     return output;
-    // }
-
-    void positionPIDCalc(double target){
+    double positionPIDCalc(){
         // PID for both sides
-        leftPIDController.setReference(target, ControlType.kPosition);
-        rightPIDController.setReference(-target, ControlType.kPosition);
+        double averagePos = (leftEncoder.getPosition() + rightEncoder.getPosition()) / 2;
+        return positionPIDController.calculate(averagePos);
     }
 
-    public double run(double targetPosition){
+    public void setDriveDistance(double targetDistance) {
+        this.targetDistance = convertIT(targetDistance);
+        positionPIDController.setSetpoint(this.targetDistance);
+    }
+
+    public boolean drive(){
         /*
         :targetPosition: distance to be driven in inches -> double
         */
 
         ballPath.setAction(BallAction.FEED);
 
-        setPoint = convertIT(targetPosition); // returns converted value from inches(targetPosition) to encoder ticks(setPpoint)
-
-        boolean intakeLoaded = ballPath.intake.ballPrimed();
-        boolean elevatorLoaded = ballPath.elevator.ballPrimed();
-        boolean robotFull = intakeLoaded && elevatorLoaded;
-        // boolean elevatorOnly = !intakeLoaded && elevatorLoaded;
-
-        // Averaging left and right revolution counts
-        double leftRevs = setPoint / leftEncoder.getCountsPerRevolution();
-        double rightRevs = setPoint / rightEncoder.getCountsPerRevolution();
-        double averageRevs = (leftRevs + rightRevs) / 2;
-
-        positionPIDCalc(averageRevs);
+        double nextSpeed = positionPIDCalc();
 
         if (calcTicks(leftEncoder) < setPoint || calcTicks(rightEncoder) < setPoint){
-            drivetrain.drivePidTank(maxSpeed, zRotation);
+            drivetrain.drivePidTank(nextSpeed, zRotation);
         } else {
             drivetrain.drivePidTank(0, zRotation);
         }
 
-        
-        
-        if(robotFull){
+        return positionPIDController.atSetpoint();
+    }
+
+    void shoot(){
+        boolean intakeLoaded = ballPath.intake.ballPrimed();
+        boolean elevatorLoaded = ballPath.elevator.ballPrimed();
+        boolean robotFull = intakeLoaded && elevatorLoaded;
+
+        if (robotFull){
             ballPath.setAction(BallAction.SHOOT);
             ballPath.shooter.setShotPosition(ShotPosition.AUTO);
         }
+    }
 
-        double leftPosition = leftEncoder.getPosition();
-        double rightPosition = rightEncoder.getPosition();
-        double averagePos = (leftPosition + rightPosition) / 2;
-
-        ballPath.setAction(BallAction.NONE);
-        ballPath.shooter.setShotPosition(ShotPosition.NONE);
-
-        return targetPosition - this.calcDistance(averagePos);
+    void stop(){
+        this.ballPath.setAction(BallAction.NONE);
+        this.ballPath.shooter.setShotPosition(ShotPosition.NONE);
     }
     
 }

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.concurrent.TimeUnit;
+
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -175,10 +177,15 @@ public class Robot extends TitanBot {
     switch (m_autoSelected) {
       case kCustomAuto:
       double autoDistance = 59; // distances in inches(about 1.5m) | will be changed
-        while(autoDistance > 0){
-          autoDistance = auto.run(autoDistance); // Run cycle(drive, intake, elevator, shooter)
-          Thread.sleep(100);
+      auto.setDriveDistance(autoDistance);
+      boolean doneDriving = false;
+        while(!doneDriving){
+          doneDriving = auto.drive(); // Run cycle(drive, intake, elevator, shooter)
+          // Thread.sleep(100);
+          waitFor(20, TimeUnit.MILLISECONDS);
+          auto.shoot();
         }
+        auto.stop();
         break;
       case kDefaultAuto:
       default:
