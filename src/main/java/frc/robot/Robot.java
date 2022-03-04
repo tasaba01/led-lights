@@ -166,7 +166,7 @@ public class Robot extends TitanBot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
 
-    auto = new Autonomous((DriveImpl) this.drive, (BallPathImpl) this.ballSubsystem);
+    auto = new Autonomous(this.drive, this.ballSubsystem);
   }
 
   /** This function is called periodically during autonomous. 

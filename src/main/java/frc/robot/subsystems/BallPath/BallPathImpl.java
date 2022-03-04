@@ -13,9 +13,9 @@ import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
 
 public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
-    public final Intake intake;
-    public final Elevator elevator;
-    public final Shooter shooter;
+    private final Intake intake;
+    private final Elevator elevator;
+    private final Shooter shooter;
 
     private BallAction action = BallAction.NONE;
 
@@ -118,5 +118,20 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 this.cancel();
                 break;
         }
+    }
+
+    @Override
+    public Intake getIntake(){
+        return this.intake;
+    }
+
+    @Override
+    public Elevator getElevator(){
+        return this.elevator;
+    }
+
+    @Override
+    public Shooter getShooter(){
+        return this.shooter;
     }
 }

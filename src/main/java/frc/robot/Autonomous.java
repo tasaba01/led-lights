@@ -1,47 +1,32 @@
 package frc.robot;
 
-import com.revrobotics.RelativeEncoder;
-// import com.revrobotics.SparkMaxRelativeEncoder;
-
 // SUBSYSTEM IMPORTS
 import frc.robot.subsystems.BallPath.BallPath.BallAction;
 import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
-import frc.robot.subsystems.BallPath.BallPathImpl;
-import frc.robot.subsystems.Drivetrain.DriveImpl;
+import frc.robot.subsystems.BallPath.BallPath;
+import frc.robot.subsystems.Drivetrain.Drive;
 
-import com.revrobotics.SparkMaxPIDController;
-// import com.revrobotics.CANSparkMax.ControlType;
-
-
+// PIDCONTROLLER IMPORTS
 import edu.wpi.first.math.controller.PIDController;
 
-// import java.util.concurrent.TimeUnit;
-// import ca.team3161.lib.robot.TitanBot;
+// ENCODER IMPORTS
+import com.revrobotics.RelativeEncoder;
 
 public class Autonomous {
 
-    private DriveImpl drivetrain;
-    // private Shooter shooter;
-    // private Intake intake;
-    // private Elevator elevator;
-    private BallPathImpl ballPath;
+    private Drive drivetrain;
+    private BallPath ballPath;
     private double wheelCircumference = Math.pow((Math.PI*2), 2);
     private double distance;
     private double setPoint;
-    private double max = 1000;
-    private double min = 0;
 
     private double kP = 0.00001;
     private double kI = 0;
     private double kD = 0;
 
-    private SparkMaxPIDController leftPIDController;
-    private SparkMaxPIDController rightPIDController;
-
     private RelativeEncoder leftEncoder;
     private RelativeEncoder rightEncoder;
-
-    // private double maxSpeed = 1;
+    
     private double zRotation = 0;
     private double targetDistance;
 
@@ -51,7 +36,7 @@ public class Autonomous {
 
 
 
-    public Autonomous(DriveImpl drivetrain, BallPathImpl ballPath){
+    public Autonomous(Drive drivetrain, BallPath ballPath){
         this.drivetrain = drivetrain;
         this.ballPath = ballPath;
         this.distance = 0;
@@ -60,21 +45,6 @@ public class Autonomous {
         this.leftEncoder = drivetrain.getEncoder(1);
         this.rightEncoder = drivetrain.getEncoder(0);
         this.positionPIDController = new PIDController(kP, kI, kD);
-        // this.leftPIDController = drivetrain.getController(1).getPIDController();
-        // this.rightPIDController = drivetrain.getController(0).getPIDController();
-
-        leftPIDController.setP(kP);
-        leftPIDController.setI(kI);
-        leftPIDController.setD(kD);
-
-        rightPIDController.setP(kP);
-        rightPIDController.setI(kI);
-        rightPIDController.setD(kD);
-
-
-        leftPIDController.setOutputRange(min, max);
-        rightPIDController.setOutputRange(min, max);
-
     }
 
     double calcDistance(RelativeEncoder encoder){
@@ -150,19 +120,19 @@ public class Autonomous {
     }
 
     void shoot(){
-        boolean intakeLoaded = ballPath.intake.ballPrimed();
-        boolean elevatorLoaded = ballPath.elevator.ballPrimed();
+        boolean intakeLoaded = ballPath.getIntake().ballPrimed();
+        boolean elevatorLoaded = ballPath.getElevator().ballPrimed();
         boolean robotFull = intakeLoaded && elevatorLoaded;
 
         if (robotFull){
             ballPath.setAction(BallAction.SHOOT);
-            ballPath.shooter.setShotPosition(ShotPosition.AUTO);
+            ballPath.getShooter().setShotPosition(ShotPosition.AUTO);
         }
     }
 
     void stop(){
         this.ballPath.setAction(BallAction.NONE);
-        this.ballPath.shooter.setShotPosition(ShotPosition.NONE);
+        this.ballPath.getShooter().setShotPosition(ShotPosition.NONE);
     }
     
 }
