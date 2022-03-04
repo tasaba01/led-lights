@@ -19,17 +19,17 @@ public final class RobotMap {
     public static final Port LEFT_COLOR_SENSOR_PORT = Port.kOnboard;
     public static final Port RIGHT_COLOR_SENSOR_PORT = Port.kOnboard;
 
-    public static final int[] INTAKE_ULTRASONIC_PORTS = {0, 0};
-    public static final int[] ELEVATOR_ULTRASONIC_PORTS = {0, 0};
-    public static final int INTAKE_TALON_PORT = 0;
+    public static final int[] INTAKE_ULTRASONIC_PORTS = {8, 9};
+    public static final int[] ELEVATOR_ULTRASONIC_PORTS = {6, 7};
+    public static final int INTAKE_TALON_PORT = 6;
 
-    public static final int ELEVATOR_TALON_PORT = 0;
+    public static final int ELEVATOR_TALON_PORT = 2;
 
     // Climber
     public static final int LIFTER_TALON_PORT = 0;
     //public static final int[] CLIMBER_SOLENOID_CHANNELS = {0,0};
 
-    public static final int SHOOTER_PORT = 1;
+    public static final int SHOOTER_PORT = 5;
     public static final int TURRET_PORT = 3;
     public static final int HOOD_PORT = 4;
 
