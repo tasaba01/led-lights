@@ -12,10 +12,11 @@ import edu.wpi.first.math.controller.PIDController;
 
 public class Autonomous {
 
+    private static final double DRIVE_DIST_TOLERANCE = 200; // TODO determine what this should really be
+    
     private Drive drivetrain;
     private BallPath ballPath;
     private double wheelCircumference = Math.pow((Math.PI*2), 2);
-    private double setPoint;
 
     private double kP = 0.00001;
     private double kI = 0;
@@ -24,17 +25,13 @@ public class Autonomous {
     private double zRotation = 0;
     private double targetDistance;
 
-    private PIDController positionPIDController;
-
-
-
-
+    private final PIDController positionPIDController;
 
     public Autonomous(Drive drivetrain, BallPath ballPath){
         this.drivetrain = drivetrain;
         this.ballPath = ballPath;
-        this.setPoint = 0;
         this.positionPIDController = new PIDController(kP, kI, kD);
+        this.positionPIDController.setTolerance(DRIVE_DIST_TOLERANCE);
     }
 
     double calcTicks(double encoderTicks){
@@ -80,11 +77,7 @@ public class Autonomous {
 
         double nextSpeed = positionPIDCalc(averageEncoderTicks);
 
-        if (calcTicks(averageEncoderTicks) < setPoint){
-            drivetrain.drivePidTank(nextSpeed, zRotation);
-        } else {
-            drivetrain.drivePidTank(0, zRotation);
-        }
+        drivetrain.drivePidTank(nextSpeed, zRotation);
 
         return positionPIDController.atSetpoint();
     }
