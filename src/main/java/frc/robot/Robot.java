@@ -197,7 +197,6 @@ public class Robot extends TitanBot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopSetup() {
-    // TODO Set up bindings
     JoystickMode mode = new DeadbandJoystickMode(0.05).andThen(new SquaredJoystickMode());
     this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(mode));
     this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, mode);

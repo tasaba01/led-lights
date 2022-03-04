@@ -8,13 +8,8 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 
 import ca.team3161.lib.robot.LifecycleEvent;
-// import ca.team3161.lib.robot.motion.drivetrains.SpeedControllerGroup;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
-// import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
-// import edu.wpi.first.wpilibj.Encoder;
-// import edu.wpi.first.math.controller.PIDController;
-// import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -222,35 +217,9 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     }
 
     @Override
-    public CANSparkMax getController(int side){
-      /*
-      :side: motor controller side(left=1, right=0) -> int
-      :return: requested motor controller
-      :rtype: CANSparkMax
-      */
-      if (side == 1){
-        return this.leftSide;
-      } else if (side == 0){
-        return this.rightSide;
-      } else {
-        return this.leftSide;
-      }
-    }
+    public Pair<Double, Double> getEncoderTicks(){
 
-    @Override
-    public RelativeEncoder getEncoder(int side){
-      /*
-      :side: Encoder side(left=1, right=0) -> int
-      :return: requested encoder
-      :rtype: RelativeEncoder
-      */
-      if (side == 1){
-        return this.leftEncoder;
-      } else if (side == 0){
-        return this.rightEncoder;
-      } else {
-        return this.leftEncoder;
-      }
+      return Pair.of(this.leftEncoder.getPosition(), this.rightEncoder.getPosition());
     }
 
     @Override
