@@ -9,10 +9,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import edu.wpi.first.wpilibj.Ultrasonic;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
 
-    private static final double MOTOR_SPEED = 0.3;
+    private static final double MOTOR_SPEED = 0.5;
     private static final double PRIMED_DIST_THRESHOLD = 15;
     private static final int SAMPLE_COUNT = 1;
 
@@ -37,8 +38,10 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     }
 
     @Override
-    public void setAction(IntakeAction action) {
-        this.action = action;
+    public void setAction(IntakeAction inputAction) {
+        this.action = inputAction;
+        // System.out.println("Intake Action Set to " + this.action);
+
     }
 
     @Override
@@ -49,6 +52,7 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     @Override
     public void task() throws Exception {
         double sensorReading = this.intakeSensor.getRangeInches();
+        SmartDashboard.putNumber("Intake ultrasonic", sensorReading);
         this.sensorSamples.add(sensorReading);
         if (sensorSamples.size() > SAMPLE_COUNT) {
             this.sensorSamples.remove();
@@ -61,7 +65,7 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
         boolean ballPresent = meanReading < PRIMED_DIST_THRESHOLD;
         // boolean stateChanged = ballPresent != lastPresent;
 
-        switch (action) {
+        switch (this.action) {
             case FEED:
                 if (ballPresent) {
                     this.intake.stopMotor();
@@ -82,6 +86,11 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
                 } else {
                     this.intake.stopMotor();
                 }
+                break;
+            case TEST:
+                // System.out.println("Intake Action Reached");
+                this.intake.set(MOTOR_SPEED);
+                // System.out.println("Intake Action Executed");
                 break;
             case NONE:
             default:

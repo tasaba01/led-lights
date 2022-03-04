@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.BallPath.BallPath;
 import frc.robot.subsystems.BallPath.BallPathImpl;
+import frc.robot.subsystems.BallPath.BallPath.BallAction;
 import frc.robot.subsystems.BallPath.Elevator.Elevator;
 import frc.robot.subsystems.BallPath.Elevator.ElevatorImpl;
 import frc.robot.subsystems.BallPath.Intake.Intake;
@@ -210,25 +212,39 @@ public class Robot extends TitanBot {
     // this.driverPad.bind(ControllerBindings.SHOOT, PressType.RELEASE, () -> this.ballSubsystem.stopShooter());
 
 
-    this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.climberSubsystem.extendOuterClimber());
+    // this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.climberSubsystem.extendOuterClimber());
     this.driverPad.bind(ControllerBindings.CLIMBER_RETRACT, PressType.PRESS, () -> this.climberSubsystem.retractOuterClimber());
     this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
+    // this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.ballSubsystem.);
 
-    this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
-      if (pressed) {
-        this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_FAR);
-      } else {
-        this.shooter.setShotPosition(ShotPosition.NONE);
-      }
-    });
-    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
-    this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+    // this.driverPad.bind(ControllerBindings.INTAKE_START, pressed ->{
+    //   if(pressed){
+    //   this.ballSubsystem.setAction(BallAction.TEST);
+    // // }else{
+    // //   this.ballSubsystem.setAction(BallAction.NONE);
+    // // }
+    // }});
+
+    this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.TEST));
+    this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
+
+    // this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
+    //   if (pressed) {
+    //     this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_FAR);
+    //   } else {
+    //     this.shooter.setShotPosition(ShotPosition.NONE);
+    //   }
+    // });
+    // this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
+    // this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
+    // System.out.println("Rountine is running");
+    
     // this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
     this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
     // this.drive.driveTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS));

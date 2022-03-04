@@ -9,10 +9,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import edu.wpi.first.wpilibj.Ultrasonic;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
-    private static final double MOTOR_SPEED = 0.75;
+    private static final double MOTOR_SPEED = 1;
     private static final double PRIMED_DIST_THRESHOLD = 2;
     private static final int SAMPLE_COUNT = 1;
 
@@ -37,8 +38,9 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     }
 
     @Override
-    public void setAction(ElevatorAction action) {
-        this.action = action;
+    public void setAction(ElevatorAction inputAction) {
+        this.action = inputAction;
+        // System.out.println("Elevator Action Set to " + this.action);
     }
 
     @Override
@@ -48,7 +50,9 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
     @Override
     public void task() throws Exception {
+
         double sensorReading = this.sensor.getRangeInches();
+        SmartDashboard.putNumber("Elevator Ultrasonic", sensorReading);
         this.sensorSamples.add(sensorReading);
         if (sensorSamples.size() > SAMPLE_COUNT) {
             this.sensorSamples.remove();
@@ -61,7 +65,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
         boolean ballPresent = meanReading < PRIMED_DIST_THRESHOLD;
         // boolean stateChanged = ballPresent != lastPresent;
 
-        switch (action) {
+        switch (this.action) {
             case FEED:
                 if (ballPresent) {
                     this.elevator.stopMotor();
@@ -82,6 +86,11 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 } else {
                     this.elevator.stopMotor();
                 }
+                break;
+            case TEST:
+                // System.out.println("Elevator Action Reached");
+                this.elevator.set(MOTOR_SPEED);
+                // System.out.println("Elevator Action Executed");
                 break;
             case NONE:
             default:

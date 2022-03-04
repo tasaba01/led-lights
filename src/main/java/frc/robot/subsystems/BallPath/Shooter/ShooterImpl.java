@@ -82,7 +82,7 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
         SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
 
-        switch (requestedPosition) {
+        switch (this.requestedPosition) {
             case AUTO:
                 setPointHood = 0; // to be decided
                 setPointShooterPID = 0; // tbd
@@ -109,6 +109,11 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
                 setPointRotation = Double.NEGATIVE_INFINITY;
                 hoodReady = false;
                 turretReady = false;
+                break;
+            case TEST:
+                setPointShooterPID = 3000;
+                setPointHood = 100_000;
+            break;
             default:
                 break;
         }

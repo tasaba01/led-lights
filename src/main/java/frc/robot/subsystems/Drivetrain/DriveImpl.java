@@ -27,11 +27,11 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // PID controller values
 
-    private double kP = 0.0001; 
+    private double kP = 0.00075; 
     private double kI = 0;
     private double kD = 0.0000; 
     private double kIz = 0; 
-    private double kFF = 0.000003; 
+    private double kFF = 0.000004; 
     private double kMaxOutput = 1; 
     private double kMinOutput = -1;
     private double maxRPM = 5200;
