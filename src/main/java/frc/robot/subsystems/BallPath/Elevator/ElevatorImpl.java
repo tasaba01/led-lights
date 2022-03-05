@@ -93,6 +93,12 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
             case TEST:
                 this.elevator.set(MOTOR_SPEED);
                 break;
+            case IN:
+                this.elevator.set(MOTOR_SPEED);
+                break;
+            case OUT:
+                this.elevator.set(-MOTOR_SPEED);
+                break;
             case NONE:
             default:
                 elevator.stopMotor();

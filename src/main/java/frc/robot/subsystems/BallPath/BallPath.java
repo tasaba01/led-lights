@@ -12,8 +12,6 @@ public interface BallPath extends Subsystem, LifecycleListener {
     Shooter getShooter();
     Elevator getElevator();
 
-
-
     enum BallAction {
         NONE,
         AUTO,

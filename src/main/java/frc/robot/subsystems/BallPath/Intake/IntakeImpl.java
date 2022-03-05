@@ -91,9 +91,13 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
                 }
                 break;
             case TEST:
-                // System.out.println("Intake Action Reached");
                 this.intake.set(MOTOR_SPEED);
-                // System.out.println("Intake Action Executed");
+                break;
+            case IN:
+                this.intake.set(MOTOR_SPEED);
+                break;
+            case OUT:
+                this.intake.set(-MOTOR_SPEED);
                 break;
             case NONE:
             default:

@@ -12,17 +12,24 @@ public final class ControllerBindings {
     public static final LogitechControl RIGHT_STICK = LogitechControl.RIGHT_STICK;
     public static final LogitechControl LEFT_STICK = LogitechControl.LEFT_STICK;
 
-    public static final LogitechButton INTAKE_START = LogitechButton.RIGHT_BUMPER;
-    public static final LogitechButton INTAKE_STOP = LogitechButton.LEFT_BUMPER;
-    public static final LogitechButton INTAKE_REVERSE = LogitechButton.B;
-    public static final LogitechButton SHOOT = LogitechButton.RIGHT_TRIGGER;
+    public static final LogitechButton INTAKE_START = LogitechButton.LEFT_TRIGGER;
+    public static final LogitechButton INTAKE_REVERSE = LogitechButton.LEFT_BUMPER;
+    public static final LogitechButton ELEVATOR_START = LogitechButton.RIGHT_TRIGGER;
+    public static final LogitechButton ELEVATOR_REVERSE = LogitechButton.RIGHT_BUMPER;
 
-    public static final LogitechButton SHOOTLAUNCHFAR = LogitechButton.LEFT_TRIGGER;
-    public static final LogitechButton SHOOTFENDER = LogitechButton.RIGHT_TRIGGER;
+    public static final LogitechButton SHOOT_FENDER = LogitechButton.A;
+    public static final LogitechButton SHOOT_LAUNCH_CLOSE = LogitechButton.X;
+    public static final LogitechButton SHOOT_LAUNCH_FAR = LogitechButton.Y;
+    public static final LogitechButton SHOOT_TARMAC = LogitechButton.B;
 
-    public static final LogitechButton CLIMBER_EXTEND = LogitechButton.Y;
-    public static final LogitechButton CLIMBER_RETRACT = LogitechButton.A;
-    public static final LogitechButton CLIMBER_ROTATE = LogitechButton.X;
+    // public static final LogitechButton SHOOT = LogitechButton.RIGHT_TRIGGER;
+
+    // public static final LogitechButton SHOOTLAUNCHFAR = LogitechButton.LEFT_TRIGGER;
+    // public static final LogitechButton SHOOTFENDER = LogitechButton.RIGHT_TRIGGER;
+
+    // public static final LogitechButton CLIMBER_EXTEND = LogitechButton.Y;
+    // public static final LogitechButton CLIMBER_RETRACT = LogitechButton.A;
+    // public static final LogitechButton CLIMBER_ROTATE = LogitechButton.X;
 
 
     
