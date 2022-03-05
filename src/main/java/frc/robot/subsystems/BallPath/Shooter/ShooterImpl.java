@@ -42,7 +42,7 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     private final double hoodBuffer = 20000;
     private final double turretBuffer = 30000;
     private final double turretSpeed = 0.3;
-    private final double hoodSpeed = 0.3;
+    private final double hoodSpeed = 1;
 
     private final PIDController shooterPid;
 
@@ -82,10 +82,10 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
         SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
 
-        switch (requestedPosition) {
+        switch (this.requestedPosition) {
             case AUTO:
-                setPointHood = 0; // to be decided
-                setPointShooterPID = 0; // tbd
+                setPointHood = 260_000; // to be decided
+                setPointShooterPID = 7000; // tbd
                 setPointRotation = 0; // will probably still be 0 for the auto shot
                 break;
             case FENDER:
@@ -109,6 +109,11 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
                 setPointRotation = Double.NEGATIVE_INFINITY;
                 hoodReady = false;
                 turretReady = false;
+                break;
+            case TEST:
+                setPointShooterPID = 3000;
+                setPointHood = 100_000;
+            break;
             default:
                 break;
         }
@@ -144,7 +149,6 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         if(setPointShooterPID != 0){
             currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooterPID);
             currentOutput = Utils.normalizePwm(currentOutput);
-            System.out.println(currentOutput);
             this.shooterMotor.set(ControlMode.PercentOutput, currentOutput);
             SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooterPID);
             SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
@@ -182,8 +186,9 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     @Override
     public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
         switch (current) {
-            case ON_INIT:
             case ON_AUTO:
+                this.hoodMotor.setSelectedSensorPosition(0);
+            case ON_INIT:
             case ON_TELEOP:
             case ON_TEST:
                 this.start();
@@ -192,6 +197,7 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
             case NONE:
             default:
                 this.cancel();
+                this.hoodMotor.setSelectedSensorPosition(0);
                 break;
         }
     }

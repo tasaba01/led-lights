@@ -34,14 +34,16 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
     }
 
     @Override
-    public void setAction(BallAction action) {
-        this.action = action;
+    public void setAction(BallAction inputAction) {
+        this.action = inputAction;
+        // System.out.println("BallPath Action Set to " + this.action);
+
     }
 
     @Override
     public void task() {
-        boolean intakeLoaded = intake.ballPrimed();
-        boolean elevatorLoaded = elevator.ballPrimed();
+        boolean intakeLoaded = this.intake.ballPrimed();
+        boolean elevatorLoaded = this.elevator.ballPrimed();
 
         boolean robotEmpty = !intakeLoaded && !elevatorLoaded;
         boolean elevatorOnly = elevatorLoaded && !intakeLoaded;
@@ -94,7 +96,20 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                     }
                 }
                 break;
+            case TEST:
+                // System.out.println("BallPath Action Reached");
+                this.intake.setAction(IntakeAction.TEST);
+                this.elevator.setAction(ElevatorAction.TEST);
+                this.shooter.setShotPosition(ShotPosition.TEST);
+                // System.out.println("BallPath Action Executed");
+                break;
             case NONE:
+                this.intake.setAction(IntakeAction.NONE);
+                this.elevator.setAction(ElevatorAction.NONE);
+                this.shooter.setShotPosition(ShotPosition.NONE);
+                break;
+            case AUTO:
+                break;
             default:
                 intake.setAction(IntakeAction.NONE);
                 elevator.setAction(ElevatorAction.NONE);

@@ -20,7 +20,7 @@ public final class RobotMap {
     public static final Port RIGHT_COLOR_SENSOR_PORT = Port.kOnboard;
 
     public static final int[] INTAKE_ULTRASONIC_PORTS = {8, 9};
-    public static final int[] ELEVATOR_ULTRASONIC_PORTS = {6, 7};
+    public static final int[] ELEVATOR_ULTRASONIC_PORTS = {7, 6};
     public static final int INTAKE_TALON_PORT = 6;
 
     public static final int ELEVATOR_TALON_PORT = 2;

@@ -19,6 +19,7 @@ public interface Shooter extends Subsystem, LifecycleListener {
         LAUNCHPAD_FAR,
         FENDER,
         AUTO,
+        TEST,
         ;
     }
 }

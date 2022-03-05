@@ -27,14 +27,15 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // PID controller values
 
-    private double kP = 0.0001; 
+    private double kP = 0.00075; 
     private double kI = 0;
     private double kD = 0.0000; 
     private double kIz = 0; 
-    private double kFF = 0.000003; 
+    private double kFF = 0.0000035; 
     private double kMaxOutput = 1; 
     private double kMinOutput = -1;
     private double maxRPM = 5200;
+    private double setpointThreshold = 300;
 
     // PID controllers
     
@@ -65,6 +66,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         leftPIDController.setIZone(kIz);
         leftPIDController.setFF(kFF);
         leftPIDController.setOutputRange(kMinOutput, kMaxOutput);
+        leftPIDController.setSmartMotionAllowedClosedLoopError(setpointThreshold, 0);
 
         rightPIDController.setP(kP);
         rightPIDController.setI(kI);
@@ -72,7 +74,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         rightPIDController.setIZone(kIz);
         rightPIDController.setFF(kFF);
         rightPIDController.setOutputRange(kMinOutput, kMaxOutput);
-
+        rightPIDController.setSmartMotionAllowedClosedLoopError(setpointThreshold, 0);
 
         // display PID coefficients on SmartDashboard
         SmartDashboard.putNumber("P Gain", kP);
@@ -97,18 +99,6 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     @Override
     public void task() throws Exception {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void driveTank(double leftSpeed, double rightSpeed) {
-        // this.drivetrain.tankDrive(leftSpeed, rightSpeed);
-        SmartDashboard.putNumber("Left Encoder Velocity", leftEncoder.getVelocity());
-        SmartDashboard.putNumber("Right Encoder Velocity", rightEncoder.getVelocity());
-    }
-
-    @Override
-    public void driveArcade(double speed, double rotation) {
-        // this.drivetrain.arcadeDrive(speed, rotation);
     }
 
     public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
@@ -157,7 +147,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         return new WheelSpeeds(leftSpeed, rightSpeed);
       }
 
-    public void  drivePidTank(double leftSpeed, double rotation){
+    public void drive(double leftSpeed, double rotation){
 
 
         // read PID coefficients from SmartDashboard
@@ -218,7 +208,6 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     @Override
     public Pair<Double, Double> getEncoderTicks(){
-
       return Pair.of(this.leftEncoder.getPosition(), this.rightEncoder.getPosition());
     }
 
@@ -229,25 +218,32 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     @Override
     public void resetEncoderTicks() {
-        // Done
-        // this.leftEncoder.reset();
-        // this.rightEncoder.reset();
-        // removing this for now as relative encoder reset on boot
-    }
-
-    @Override
-    public Pair<Double, Double> distanceDriven() {
-        // return distance of either encoder
-        return Pair.of(this.leftEncoder.getPosition() , this.rightEncoder.getPosition());
+        this.leftEncoder.setPosition(0);
+        this.rightEncoder.setPosition(0);
     }
 
     public void setSetpoint(double leftSetPoint, double rightSetPoint){
        this.leftPIDController.setReference(leftSetPoint, ControlType.kPosition);
-       this.rightPIDController.setReference(rightSetPoint, ControlType.kPosition);
-       
+       this.rightPIDController.setReference(rightSetPoint, ControlType.kPosition); 
     }
     
     @Override
-    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {}
+    public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
+      switch (current) {
+        case ON_INIT:
+        case ON_AUTO:
+        case ON_TELEOP:
+        case ON_TEST:
+          this.start();
+          break;
+        case ON_DISABLED:
+        case NONE:
+        default:
+          this.leftEncoder.setPosition(0);
+          this.rightEncoder.setPosition(0);
+          this.cancel();
+          break;
+    }
+  }
 
 }
