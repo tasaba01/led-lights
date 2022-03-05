@@ -27,7 +27,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // PID controller values
 
-    private double kP = 0.00085; 
+    private double kP = 0.00075; 
     private double kI = 0;
     private double kD = 0.0000; 
     private double kIz = 0; 
@@ -101,18 +101,6 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void driveTank(double leftSpeed, double rightSpeed) {
-        // this.drivetrain.tankDrive(leftSpeed, rightSpeed);
-        SmartDashboard.putNumber("Left Encoder Velocity", leftEncoder.getVelocity());
-        SmartDashboard.putNumber("Right Encoder Velocity", rightEncoder.getVelocity());
-    }
-
-    @Override
-    public void driveArcade(double speed, double rotation) {
-        // this.drivetrain.arcadeDrive(speed, rotation);
-    }
-
     public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
         xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
         zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
@@ -159,7 +147,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         return new WheelSpeeds(leftSpeed, rightSpeed);
       }
 
-    public void  drivePidTank(double leftSpeed, double rotation){
+    public void drive(double leftSpeed, double rotation){
 
 
         // read PID coefficients from SmartDashboard
@@ -220,7 +208,6 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     @Override
     public Pair<Double, Double> getEncoderTicks(){
-
       return Pair.of(this.leftEncoder.getPosition(), this.rightEncoder.getPosition());
     }
 
@@ -231,22 +218,13 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     @Override
     public void resetEncoderTicks() {
-        // Done
-        // this.leftEncoder.reset();
-        // this.rightEncoder.reset();
-        // removing this for now as relative encoder reset on boot
-    }
-
-    @Override
-    public Pair<Double, Double> distanceDriven() {
-        // return distance of either encoder
-        return Pair.of(this.leftEncoder.getPosition() , this.rightEncoder.getPosition());
+        this.leftEncoder.setPosition(0);
+        this.rightEncoder.setPosition(0);
     }
 
     public void setSetpoint(double leftSetPoint, double rightSetPoint){
        this.leftPIDController.setReference(leftSetPoint, ControlType.kPosition);
-       this.rightPIDController.setReference(rightSetPoint, ControlType.kPosition);
-       
+       this.rightPIDController.setReference(rightSetPoint, ControlType.kPosition); 
     }
     
     @Override

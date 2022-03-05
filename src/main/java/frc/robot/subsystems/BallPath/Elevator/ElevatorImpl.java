@@ -66,6 +66,9 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
         // boolean stateChanged = ballPresent != lastPresent;
 
         switch (this.action) {
+            case AUTO:
+                this.elevator.set(MOTOR_SPEED);
+                break;
             case FEED:
                 if (ballPresent) {
                     this.elevator.stopMotor();
@@ -88,9 +91,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 }
                 break;
             case TEST:
-                // System.out.println("Elevator Action Reached");
                 this.elevator.set(MOTOR_SPEED);
-                // System.out.println("Elevator Action Executed");
                 break;
             case NONE:
             default:

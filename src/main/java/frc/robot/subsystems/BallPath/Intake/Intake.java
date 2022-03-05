@@ -9,6 +9,7 @@ public interface Intake extends Subsystem, LifecycleListener {
 
     enum IntakeAction {
         NONE,
+        AUTO,
         PRIME,
         REJECT,
         FEED,

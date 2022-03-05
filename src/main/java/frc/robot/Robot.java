@@ -22,6 +22,7 @@ import ca.team3161.lib.utils.controls.JoystickMode;
 import ca.team3161.lib.utils.controls.LinearJoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.SquaredJoystickMode;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,6 +39,7 @@ import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.DriveImpl;
+import frc.robot.subsystems.Drivetrain.RawDriveImpl;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -90,10 +92,10 @@ public class Robot extends TitanBot {
     leftControllerFollower.follow(leftControllerPrimary);
     rightControllerFollower.follow(rightControllerPrimary);
 
-    leftControllerPrimary.setSmartCurrentLimit(35);
-    leftControllerFollower.setSmartCurrentLimit(35);
-    rightControllerPrimary.setSmartCurrentLimit(35);
-    rightControllerFollower.setSmartCurrentLimit(35);
+    leftControllerPrimary.setSmartCurrentLimit(30);
+    leftControllerFollower.setSmartCurrentLimit(30);
+    rightControllerPrimary.setSmartCurrentLimit(30);
+    rightControllerFollower.setSmartCurrentLimit(30);
     
     leftControllerPrimary.setIdleMode(CANSparkMax.IdleMode.kBrake);
     leftControllerFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -111,7 +113,7 @@ public class Robot extends TitanBot {
     RelativeEncoder leftEncoderPrimary = leftControllerPrimary.getEncoder();
     RelativeEncoder rightEncoderPrimary = rightControllerPrimary.getEncoder();
 
-    this.drive = new DriveImpl(leftControllerPrimary, rightControllerPrimary, leftEncoderPrimary, rightEncoderPrimary);
+    this.drive = new RawDriveImpl(leftControllerPrimary, rightControllerPrimary, leftEncoderPrimary, rightEncoderPrimary);
 
     // INTAKE COMPONENTS
     WPI_TalonSRX intakeMotorController = new WPI_TalonSRX(RobotMap.INTAKE_TALON_PORT);
@@ -173,7 +175,7 @@ public class Robot extends TitanBot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
 
-    auto = new Autonomous(this.drive, this.ballSubsystem);
+    auto = new Autonomous(this::waitFor, this.drive, this.ballSubsystem);
   }
 
   /** This function is called periodically during autonomous. 
@@ -181,17 +183,22 @@ public class Robot extends TitanBot {
    * */
   @Override
   public void autonomousRoutine() throws InterruptedException {
+    drive.resetEncoderTicks();
     switch (m_autoSelected) {
       case kCustomAuto:
-      double autoDistance = 59; // distances in inches(about 1.5m) | will be changed
-      auto.setDriveDistance(autoDistance);
-      boolean doneDriving = false;
+        double autoDistance = 80;
+        auto.setDriveDistance(autoDistance);
+        boolean doneDriving = false;
         while(!doneDriving){
           doneDriving = auto.drive(); // Run cycle(drive, intake, elevator, shooter)
+          auto.prepareToShoot();
           // Thread.sleep(100);
           waitFor(20, TimeUnit.MILLISECONDS);
-          auto.shoot();
         }
+        System.out.println("Auto done driving");
+        auto.stopDriving();
+        auto.shoot();
+        Timer.delay(4);
         auto.stop();
         break;
       case kDefaultAuto:
@@ -199,6 +206,7 @@ public class Robot extends TitanBot {
         // Put default auto code here
         break;
     }
+    System.out.println("Auto exiting");
   }
 
   /** This function is called once when teleop is enabled. */
@@ -206,7 +214,7 @@ public class Robot extends TitanBot {
   public void teleopSetup() {
     JoystickMode deadbandMode = new DeadbandJoystickMode(0.05);
     this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(deadbandMode));
-    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, deadbandMode.andThen(x -> x * .6));
+    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, deadbandMode.andThen(x -> x * .75));
     // this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
     // this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
     // this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
@@ -223,7 +231,7 @@ public class Robot extends TitanBot {
 
     this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.TEST));
     this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
-
+    
     // this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
     //   if (pressed) {
     //     this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_FAR);
@@ -234,6 +242,7 @@ public class Robot extends TitanBot {
     // this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
     // this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
+    this.ballSubsystem.setAction(BallPath.BallAction.NONE);
   }
 
   /** This function is called periodically during operator control. */
@@ -242,14 +251,12 @@ public class Robot extends TitanBot {
     // System.out.println("Rountine is running");
     
     // this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
-    this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
+    this.drive.drive(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
     // this.drive.driveTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS));
 
     // Some pid code
     // this.drive.setSetpoint(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS));
     // this.drive.drivePidTank();
-
-
   }
 
   /** This function is called once when the robot is disabled. */

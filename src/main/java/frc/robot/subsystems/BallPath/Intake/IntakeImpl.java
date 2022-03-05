@@ -66,6 +66,9 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
         // boolean stateChanged = ballPresent != lastPresent;
 
         switch (this.action) {
+            case AUTO:
+                this.intake.set(MOTOR_SPEED);
+                break;
             case FEED:
                 if (ballPresent) {
                     this.intake.stopMotor();
