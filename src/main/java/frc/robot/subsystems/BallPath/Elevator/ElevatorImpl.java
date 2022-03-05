@@ -14,7 +14,7 @@ import frc.robot.subsystems.BallPath.Shooter.Shooter;
 
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
-    private static final double MOTOR_SPEED = 1;
+    private static final double MOTOR_SPEED = 0.8;
     private static final double PRIMED_DIST_THRESHOLD = 2;
     private static final int SAMPLE_COUNT = 1;
 
@@ -22,7 +22,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     private final Ultrasonic sensor;
     private final Shooter shooter;
 
-    private ElevatorAction action = ElevatorAction.NONE;
+    private volatile ElevatorAction action = ElevatorAction.NONE;
     private boolean lastPresent = false;
     private final Queue<Double> sensorSamples;
 
@@ -38,6 +38,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     public void defineResources() {
         require(elevator);
         require(sensor);
+        require(shooter);
     }
 
     @Override

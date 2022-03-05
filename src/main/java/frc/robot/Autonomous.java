@@ -91,7 +91,7 @@ public class Autonomous {
 
         double nextSpeed = positionPIDCalc(averageEncoderTicks);
 
-        drivetrain.drive(nextSpeed, zRotation);
+        drivetrain.drive(nextSpeed * 0.875 /* fudge it slower */, zRotation);
 
         return positionPIDController.atSetpoint();
     }
@@ -103,7 +103,7 @@ public class Autonomous {
 
         ballPath.setAction(BallPath.BallAction.AUTO);
         ballPath.getIntake().setAction(Intake.IntakeAction.AUTO);
-        ballPath.getShooter().setShotPosition(Shooter.ShotPosition.AUTO);
+        ballPath.getShooter().setShotPosition(Shooter.ShotPosition.TARMAC);
     }
 
     void shoot() throws InterruptedException {

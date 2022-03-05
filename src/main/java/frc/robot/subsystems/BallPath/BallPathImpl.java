@@ -17,7 +17,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
     private final Elevator elevator;
     private final Shooter shooter;
 
-    private BallAction action = BallAction.NONE;
+    private volatile BallAction action = BallAction.NONE;
 
     public BallPathImpl(Intake intake, Elevator elevator, Shooter shooter) {
         super(20, TimeUnit.MILLISECONDS);
@@ -28,9 +28,9 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
     @Override
     public void defineResources(){
-        require(intake);
-        require(elevator);
-        require(shooter);
+        // require(intake);
+        // require(elevator);
+        // require(shooter);
     }
 
     @Override
@@ -105,6 +105,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 this.shooter.setShotPosition(ShotPosition.NONE);
                 break;
             case AUTO:
+            case MANUAL:
                 break;
             default:
                 intake.setAction(IntakeAction.NONE);
