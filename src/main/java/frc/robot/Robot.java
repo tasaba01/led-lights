@@ -121,17 +121,17 @@ public class Robot extends TitanBot {
     Ultrasonic intakeSensor = new Ultrasonic(RobotMap.INTAKE_ULTRASONIC_PORTS[0], RobotMap.INTAKE_ULTRASONIC_PORTS[1]);
     this.intake = new IntakeImpl(intakeMotorController, intakeSensor);
 
-    // ELEVATOR COMPONENTS
-    WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
-    Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
-    this.elevator = new ElevatorImpl(elevatorMotorController, elevatorSensor);
-
     // SHOOTER COMPONENTS
     TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
     TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
     TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
     this.shooter = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
     this.ballSubsystem = new BallPathImpl(intake, elevator, shooter);
+
+    // ELEVATOR COMPONENTS
+    WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
+    Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
+    this.elevator = new ElevatorImpl(elevatorMotorController, elevatorSensor, shooter);
 
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);

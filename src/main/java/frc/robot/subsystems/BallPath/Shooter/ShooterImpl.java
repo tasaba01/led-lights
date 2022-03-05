@@ -166,10 +166,19 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     @Override
     public void getDistance(double ty, double angle1, double angle2){}
 
-    // runs flywheel
+    @Override
+    public boolean blocking() {
+        boolean spinningUp = setPointShooterPID > 0 && !shooterPid.atSetpoint();
+        // threshold to allow for a little bit of sensor movement around 0, not requiring absolute stillness
+        double threshold = 500;
+        double absoluteWheelSpeed = Math.abs(shooterEncoderReadingVelocity);
+        boolean spinningDown = setPointShooterPID == 0 && absoluteWheelSpeed > threshold;
+        return spinningUp || spinningDown;
+    }
+
     @Override
     public boolean readyToShoot(){
-        return turretReady && hoodReady;
+        return turretReady && hoodReady && shooterPid.atSetpoint();
     }
 
     @Override
