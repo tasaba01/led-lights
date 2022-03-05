@@ -7,22 +7,23 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import ca.team3161.lib.robot.LifecycleEvent;
+import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import ca.team3161.lib.utils.Utils;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
+public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Shooter {
 
     private final TalonSRX turretMotor;
     private final TalonFX shooterMotor;
     private final TalonSRX hoodMotor;
 
-    private double kp = 0.00035;
-    private double ki = 0.000075;
-    private double kd = 0.00003;
+    private double kp = 0.00175;
+    private double ki = 0.00002;
+    private double kd = 0.00002;
 
-    private ShotPosition requestedPosition = ShotPosition.NONE;
+    private volatile ShotPosition requestedPosition = ShotPosition.NONE;
     private double setPointHood;
     private double setPointRotation;
     private double setPointShooterPID;
@@ -39,19 +40,20 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
 
     private double currentOutput;
 
-    private final double hoodBuffer = 20000;
+    private final double hoodBuffer = 12500;
     private final double turretBuffer = 30000;
     private final double turretSpeed = 0.3;
-    private final double hoodSpeed = 1;
+    private final double hoodSpeed = 0.5;
 
     private final PIDController shooterPid;
 
-    public ShooterImpl(TalonSRX turretMotor, TalonFX shooterMotor, TalonSRX hoodMotor) {
+    public PIDShooterImpl(TalonSRX turretMotor, TalonFX shooterMotor, TalonSRX hoodMotor) {
         super(10, TimeUnit.MILLISECONDS);
         this.turretMotor = turretMotor;
         this.shooterMotor = shooterMotor;
         this.hoodMotor = hoodMotor;
         this.shooterPid = new PIDController(kp, ki, kd);
+        this.shooterPid.setTolerance(50);
     }
 
     @Override
@@ -83,14 +85,17 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
 
         switch (this.requestedPosition) {
-            case AUTO:
-                setPointHood = 260_000; // to be decided
-                setPointShooterPID = 7000; // tbd
+            case TARMAC:
+                setPointHood = 230_000; // to be decided
+                setPointShooterPID = 5_400; // tbd
+                // setPointShooterPID = 0.45;
                 setPointRotation = 0; // will probably still be 0 for the auto shot
                 break;
             case FENDER:
-                setPointHood = 100000;
-                setPointShooterPID = 0; // tbd
+                setPointHood = 99_000;
+                // setPointHood = 100_000;
+                setPointShooterPID = 5_300; // tbd
+                // setPointShooterPID = 0.35;
                 setPointRotation = 0;
                 break;
             case LAUNCHPAD_CLOSE:
@@ -99,21 +104,22 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
                 setPointRotation = 0; // tbd
                 break;
             case LAUNCHPAD_FAR:
-                setPointHood = 300000;
+                // setPointHood = 300000;
+                setPointHood = 0;
                 setPointShooterPID = 0; // tbd
                 setPointRotation = 200000;
                 break;
             case NONE:
                 setPointShooterPID = 0;
-                setPointHood = Double.NEGATIVE_INFINITY;
-                setPointRotation = Double.NEGATIVE_INFINITY;
+                setPointHood = 0;
+                setPointRotation = 0;
                 hoodReady = false;
                 turretReady = false;
                 break;
             case TEST:
                 setPointShooterPID = 3000;
                 setPointHood = 100_000;
-            break;
+                break;
             default:
                 break;
         }
@@ -148,13 +154,15 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
 
         if(setPointShooterPID != 0){
             currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooterPID);
+            currentOutput += 0.01; // hack "feed forward"
             currentOutput = Utils.normalizePwm(currentOutput);
-            this.shooterMotor.set(ControlMode.PercentOutput, currentOutput);
             SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooterPID);
             SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         } else {
-            this.shooterMotor.set(ControlMode.PercentOutput, 0);
+            currentOutput = 0;
         }
+        this.shooterMotor.set(ControlMode.PercentOutput, currentOutput);
+        // System.out.println("Shooter setpoint " + setPointShooterPID + ", speed " + shooterEncoderReadingVelocity + ", power " + currentOutput);
     }
 
     @Override
@@ -174,6 +182,7 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
         double absoluteWheelSpeed = Math.abs(shooterEncoderReadingVelocity);
         boolean spinningDown = setPointShooterPID == 0 && absoluteWheelSpeed > threshold;
         return spinningUp || spinningDown;
+        // return false;
     }
 
     @Override
@@ -192,16 +201,23 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
     }
 
     @Override
+    public void resetSensors() {
+        this.hoodMotor.setSelectedSensorPosition(0);
+    }
+
+    @Override
     public void lifecycleStatusChanged(LifecycleEvent previous, LifecycleEvent current) {
         switch (current) {
-            case ON_AUTO:
-                this.hoodMotor.setSelectedSensorPosition(0);
             case ON_INIT:
+                this.hoodMotor.setSelectedSensorPosition(0);
+            case ON_AUTO:
             case ON_TELEOP:
             case ON_TEST:
                 this.start();
                 break;
             case ON_DISABLED:
+                this.cancel();
+                break;
             case NONE:
             default:
                 this.cancel();

@@ -12,13 +12,14 @@ public interface Shooter extends Subsystem, LifecycleListener {
     int checkBalls();
     void stopMotors();
     void setShotPosition(ShotPosition shotPosition);
+    void resetSensors();
 
     enum ShotPosition {
         NONE,
         LAUNCHPAD_CLOSE,
         LAUNCHPAD_FAR,
         FENDER,
-        AUTO,
+        TARMAC,
         TEST,
         ;
     }

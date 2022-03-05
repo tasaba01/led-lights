@@ -6,6 +6,8 @@ package frc.robot;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -34,7 +36,8 @@ import frc.robot.subsystems.BallPath.Intake.Intake.IntakeAction;
 import frc.robot.subsystems.BallPath.Intake.IntakeImpl;
 import frc.robot.subsystems.BallPath.Shooter.Shooter;
 import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
-import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
+import frc.robot.subsystems.BallPath.Shooter.PIDShooterImpl;
+import frc.robot.subsystems.BallPath.Shooter.RawShooterImpl;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.RawDriveImpl;
@@ -125,14 +128,17 @@ public class Robot extends TitanBot {
     // SHOOTER COMPONENTS
     TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
     TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
+    shooterMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 1));
+    shooterMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 38, 45, 0.5));
     TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
-    this.shooter = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
-    this.ballSubsystem = new BallPathImpl(intake, elevator, shooter);
+    this.shooter = new PIDShooterImpl(turretMotor, shooterMotor, hoodMotor);
 
     // ELEVATOR COMPONENTS
     WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
     Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
     this.elevator = new ElevatorImpl(elevatorMotorController, elevatorSensor, shooter);
+
+    this.ballSubsystem = new BallPathImpl(intake, elevator, shooter);
 
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
@@ -142,11 +148,12 @@ public class Robot extends TitanBot {
 
     // register lifecycle components
     registerLifecycleComponent(driverPad);
+    registerLifecycleComponent(operatorPad);
     registerLifecycleComponent(drive);
-    registerLifecycleComponent(ballSubsystem);
     registerLifecycleComponent(intake);
     registerLifecycleComponent(elevator);
     registerLifecycleComponent(shooter);
+    registerLifecycleComponent(ballSubsystem);
   }
 
   /**
@@ -175,6 +182,14 @@ public class Robot extends TitanBot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
 
+    driverPad.start();
+    operatorPad.start();
+    drive.start();
+    intake.start();
+    elevator.start();
+    shooter.start();
+    ballSubsystem.start();
+
     auto = new Autonomous(this::waitFor, this.drive, this.ballSubsystem);
   }
 
@@ -186,13 +201,14 @@ public class Robot extends TitanBot {
     drive.resetEncoderTicks();
     switch (m_autoSelected) {
       case kCustomAuto:
-        double autoDistance = 50;
+        double autoDistance = 24;
         auto.setDriveDistance(autoDistance);
+        auto.prepareToShoot();
+        Timer.delay(1);
         boolean doneDriving = false;
         while(!doneDriving){
           doneDriving = auto.drive(); // Run cycle(drive, intake, elevator, shooter)
           auto.prepareToShoot();
-          // Thread.sleep(100);
           waitFor(20, TimeUnit.MILLISECONDS);
         }
         auto.stopDriving();
@@ -235,13 +251,13 @@ public class Robot extends TitanBot {
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_CLOSE));
+    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.PRESS, () -> this.shooter.resetSensors());
     this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_FAR));
+    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.NONE/*LAUNCHPAD_FAR*/));
     this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.AUTO));
+    this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.TARMAC));
     this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
     // this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
@@ -254,7 +270,15 @@ public class Robot extends TitanBot {
     // this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
     // this.operatorPad.bind(ControllerBindings.SHOOTFENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-    this.ballSubsystem.setAction(BallPath.BallAction.NONE);
+    this.ballSubsystem.setAction(BallPath.BallAction.MANUAL);
+    
+    driverPad.start();
+    operatorPad.start();
+    drive.start();
+    intake.start();
+    elevator.start();
+    shooter.start();
+    ballSubsystem.start();
   }
 
   /** This function is called periodically during operator control. */
@@ -289,7 +313,15 @@ public class Robot extends TitanBot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledSetup() {}
+  public void disabledSetup() {
+    driverPad.cancel();
+    operatorPad.cancel();
+    drive.cancel();
+    intake.cancel();
+    elevator.cancel();
+    shooter.cancel();
+    ballSubsystem.cancel();
+  }
 
   /** This function is called periodically when disabled. */
   @Override

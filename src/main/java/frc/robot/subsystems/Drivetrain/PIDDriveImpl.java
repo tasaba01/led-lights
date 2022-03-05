@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 
-public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
+public class PIDDriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     // motor controller groups
     private CANSparkMax leftSide;
@@ -44,7 +44,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
     // private DifferentialDrive drivetrain;
 
 
-    public DriveImpl(CANSparkMax leftSide, CANSparkMax rightSide, RelativeEncoder leftEncoder, RelativeEncoder rightEncoder) {
+    public PIDDriveImpl(CANSparkMax leftSide, CANSparkMax rightSide, RelativeEncoder leftEncoder, RelativeEncoder rightEncoder) {
         super(20, TimeUnit.MILLISECONDS);
         // basic drivetrain stuff
         this.leftSide = leftSide;
