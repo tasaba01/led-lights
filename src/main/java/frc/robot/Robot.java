@@ -195,7 +195,6 @@ public class Robot extends TitanBot {
           // Thread.sleep(100);
           waitFor(20, TimeUnit.MILLISECONDS);
         }
-        System.out.println("Auto done driving");
         auto.stopDriving();
         auto.shoot();
         Timer.delay(4);
@@ -206,7 +205,6 @@ public class Robot extends TitanBot {
         // Put default auto code here
         break;
     }
-    System.out.println("Auto exiting");
   }
 
   /** This function is called once when teleop is enabled. */
@@ -262,8 +260,6 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    // System.out.println("Rountine is running");
-    
     // this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
     this.drive.drive(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
     // this.drive.driveTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS));

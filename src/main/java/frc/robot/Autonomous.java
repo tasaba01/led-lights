@@ -75,9 +75,8 @@ public class Autonomous {
         return positionPIDController.calculate(encoderTicks);
     }
 
-    public void setDriveDistance(double ticks) {
-        this.targetDistance = ticks;
-        // System.out.println(String.format("Driving %d encoder ticks (%d)...", targetDistance, inches));
+    public void setDriveDistance(double distance) {
+        this.targetDistance = distance;
         positionPIDController.setSetpoint(this.targetDistance);
     }
 

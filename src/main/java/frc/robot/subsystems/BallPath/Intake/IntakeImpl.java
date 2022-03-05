@@ -40,8 +40,6 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     @Override
     public void setAction(IntakeAction inputAction) {
         this.action = inputAction;
-        // System.out.println("Intake Action Set to " + this.action);
-
     }
 
     @Override

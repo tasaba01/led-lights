@@ -188,7 +188,6 @@ public class ShooterImpl extends RepeatingPooledSubsystem implements Shooter {
 
     @Override
     public void stopMotors(){
-        System.out.println("DISABLING THE SHOOTER");
         setShotPosition(ShotPosition.NONE);
     }
 

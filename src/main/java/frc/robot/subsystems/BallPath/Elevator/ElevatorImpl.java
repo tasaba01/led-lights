@@ -43,7 +43,6 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     @Override
     public void setAction(ElevatorAction inputAction) {
         this.action = inputAction;
-        // System.out.println("Elevator Action Set to " + this.action);
     }
 
     @Override
