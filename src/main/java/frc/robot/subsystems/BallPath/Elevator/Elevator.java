@@ -13,7 +13,9 @@ public interface Elevator extends Subsystem, LifecycleListener {
         PRIME,
         REJECT,
         FEED,
-        TEST
+        TEST,
+        IN,
+        OUT,
         ;
     }
 }

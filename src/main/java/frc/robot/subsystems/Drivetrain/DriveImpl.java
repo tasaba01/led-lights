@@ -147,7 +147,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
         return new WheelSpeeds(leftSpeed, rightSpeed);
       }
 
-    public void drive(double leftSpeed, double rotation){
+    public void drive(double forward, double rotation){
 
 
         // read PID coefficients from SmartDashboard
@@ -187,7 +187,7 @@ public class DriveImpl extends RepeatingPooledSubsystem implements Drive {
          *  com.revrobotics.CANSparkMax.ControlType.kVoltage
          */
     
-        var speeds = arcadeDriveIK(leftSpeed, rotation, true);
+        var speeds = arcadeDriveIK(forward, rotation, true);
     
         double leftSetPoint = speeds.left * maxRPM;
         double rightSetPoint = speeds.right * maxRPM;

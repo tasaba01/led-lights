@@ -40,8 +40,6 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     @Override
     public void setAction(IntakeAction inputAction) {
         this.action = inputAction;
-        // System.out.println("Intake Action Set to " + this.action);
-
     }
 
     @Override
@@ -91,9 +89,13 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
                 }
                 break;
             case TEST:
-                // System.out.println("Intake Action Reached");
                 this.intake.set(MOTOR_SPEED);
-                // System.out.println("Intake Action Executed");
+                break;
+            case IN:
+                this.intake.set(MOTOR_SPEED);
+                break;
+            case OUT:
+                this.intake.set(-MOTOR_SPEED);
                 break;
             case NONE:
             default:

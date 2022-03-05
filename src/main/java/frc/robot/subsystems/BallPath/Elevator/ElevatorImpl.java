@@ -10,6 +10,7 @@ import ca.team3161.lib.robot.LifecycleEvent;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.BallPath.Shooter.Shooter;
 
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
@@ -19,15 +20,17 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
     private final WPI_TalonSRX elevator;
     private final Ultrasonic sensor;
+    private final Shooter shooter;
 
     private ElevatorAction action = ElevatorAction.NONE;
     private boolean lastPresent = false;
     private final Queue<Double> sensorSamples;
 
-    public ElevatorImpl(WPI_TalonSRX elevator, Ultrasonic sensor) {
+    public ElevatorImpl(WPI_TalonSRX elevator, Ultrasonic sensor, Shooter shooter) {
         super(20, TimeUnit.MILLISECONDS);
         this.elevator = elevator;
         this.sensor = sensor;
+        this.shooter = shooter;
         this.sensorSamples = new ArrayDeque<>();
     }
 
@@ -40,7 +43,6 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     @Override
     public void setAction(ElevatorAction inputAction) {
         this.action = inputAction;
-        // System.out.println("Elevator Action Set to " + this.action);
     }
 
     @Override
@@ -91,7 +93,17 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 }
                 break;
             case TEST:
-                this.elevator.set(MOTOR_SPEED);
+                if (shooter.readyToShoot()) {
+                    this.elevator.set(MOTOR_SPEED);
+                }
+                break;
+            case IN:
+                if (!shooter.blocking()) {
+                    this.elevator.set(MOTOR_SPEED);
+                }
+                break;
+            case OUT:
+                this.elevator.set(-MOTOR_SPEED);
                 break;
             case NONE:
             default:

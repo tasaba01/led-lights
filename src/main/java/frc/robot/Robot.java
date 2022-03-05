@@ -6,7 +6,6 @@ package frc.robot;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -19,26 +18,25 @@ import ca.team3161.lib.utils.controls.DeadbandJoystickMode;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.InvertedJoystickMode;
 import ca.team3161.lib.utils.controls.JoystickMode;
-import ca.team3161.lib.utils.controls.LinearJoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
-import ca.team3161.lib.utils.controls.SquaredJoystickMode;
+import ca.team3161.lib.utils.controls.LogitechDualAction.DpadDirection;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.BallPath.BallPath;
 import frc.robot.subsystems.BallPath.BallPathImpl;
-import frc.robot.subsystems.BallPath.BallPath.BallAction;
 import frc.robot.subsystems.BallPath.Elevator.Elevator;
+import frc.robot.subsystems.BallPath.Elevator.Elevator.ElevatorAction;
 import frc.robot.subsystems.BallPath.Elevator.ElevatorImpl;
 import frc.robot.subsystems.BallPath.Intake.Intake;
+import frc.robot.subsystems.BallPath.Intake.Intake.IntakeAction;
 import frc.robot.subsystems.BallPath.Intake.IntakeImpl;
 import frc.robot.subsystems.BallPath.Shooter.Shooter;
-import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
 import frc.robot.subsystems.BallPath.Shooter.Shooter.ShotPosition;
+import frc.robot.subsystems.BallPath.Shooter.ShooterImpl;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Drivetrain.Drive;
-import frc.robot.subsystems.Drivetrain.DriveImpl;
 import frc.robot.subsystems.Drivetrain.RawDriveImpl;
 
 /**
@@ -58,8 +56,10 @@ public class Robot extends TitanBot {
   private LogitechDualAction driverPad;
   private LogitechDualAction operatorPad;
   private BallPath ballSubsystem;
-  private Climber climberSubsystem;
+  private Intake intake;
+  private Elevator elevator;
   private Shooter shooter;
+  private Climber climberSubsystem;
 
   private Autonomous auto;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
@@ -120,12 +120,7 @@ public class Robot extends TitanBot {
     //ColorSensorV3 leftColorSensor = new ColorSensorV3(RobotMap.LEFT_COLOR_SENSOR_PORT);
     //ColorSensorV3 rightColorSensor = new ColorSensorV3(RobotMap.RIGHT_COLOR_SENSOR_PORT);
     Ultrasonic intakeSensor = new Ultrasonic(RobotMap.INTAKE_ULTRASONIC_PORTS[0], RobotMap.INTAKE_ULTRASONIC_PORTS[1]);
-    Intake intake = new IntakeImpl(intakeMotorController, intakeSensor);
-
-    // ELEVATOR COMPONENTS
-    WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
-    Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
-    Elevator elevator = new ElevatorImpl(elevatorMotorController, elevatorSensor);
+    this.intake = new IntakeImpl(intakeMotorController, intakeSensor);
 
     // SHOOTER COMPONENTS
     TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
@@ -133,6 +128,11 @@ public class Robot extends TitanBot {
     TalonSRX hoodMotor = new TalonSRX(RobotMap.HOOD_PORT);
     this.shooter = new ShooterImpl(turretMotor, shooterMotor, hoodMotor);
     this.ballSubsystem = new BallPathImpl(intake, elevator, shooter);
+
+    // ELEVATOR COMPONENTS
+    WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
+    Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
+    this.elevator = new ElevatorImpl(elevatorMotorController, elevatorSensor, shooter);
 
     // Driverpad impl
     this.driverPad = new LogitechDualAction(RobotMap.DRIVER_PAD_PORT);
@@ -186,7 +186,7 @@ public class Robot extends TitanBot {
     drive.resetEncoderTicks();
     switch (m_autoSelected) {
       case kCustomAuto:
-        double autoDistance = 80;
+        double autoDistance = 50;
         auto.setDriveDistance(autoDistance);
         boolean doneDriving = false;
         while(!doneDriving){
@@ -195,7 +195,6 @@ public class Robot extends TitanBot {
           // Thread.sleep(100);
           waitFor(20, TimeUnit.MILLISECONDS);
         }
-        System.out.println("Auto done driving");
         auto.stopDriving();
         auto.shoot();
         Timer.delay(4);
@@ -206,15 +205,14 @@ public class Robot extends TitanBot {
         // Put default auto code here
         break;
     }
-    System.out.println("Auto exiting");
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopSetup() {
     JoystickMode deadbandMode = new DeadbandJoystickMode(0.05);
-    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(deadbandMode));
-    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, deadbandMode.andThen(x -> x * .75));
+    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS, deadbandMode.andThen(x -> x * .75));
+    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(deadbandMode));
     // this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
     // this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
     // this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
@@ -229,9 +227,23 @@ public class Robot extends TitanBot {
     // this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
     // this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.ballSubsystem.);
 
-    this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.TEST));
-    this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
-    
+    this.operatorPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.intake.setAction(IntakeAction.IN));
+    this.operatorPad.bind(ControllerBindings.INTAKE_START, PressType.RELEASE, () -> this.intake.setAction(IntakeAction.NONE));
+    this.operatorPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.intake.setAction(IntakeAction.OUT));
+    this.operatorPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.RELEASE, () -> this.intake.setAction(IntakeAction.NONE));
+
+    this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
+    this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+
+    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_CLOSE));
+    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+
+    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_FAR));
+    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+
+    this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.AUTO));
+    this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+
     // this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
     //   if (pressed) {
     //     this.shooter.setShotPosition(ShotPosition.LAUNCHPAD_FAR);
@@ -248,15 +260,31 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    // System.out.println("Rountine is running");
-    
-    // this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
-    this.drive.drive(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
-    // this.drive.driveTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS));
+      double forward = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
+      double turn = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
+      this.drive.drive(forward, turn);
 
-    // Some pid code
-    // this.drive.setSetpoint(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS));
-    // this.drive.drivePidTank();
+      DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
+      switch (dpadDirection) {
+          case UP:
+              this.elevator.setAction(ElevatorAction.IN);
+              break;
+          case DOWN:
+              this.elevator.setAction(ElevatorAction.OUT);
+              break;
+          default:
+              this.elevator.setAction(ElevatorAction.NONE);
+              break;
+      }
+  }
+
+  static DpadDirection angleToDpadDirection(int angle) {
+      for (DpadDirection d : DpadDirection.values()) {
+          if (d.getAngle() == angle) {
+              return d;
+          }
+      }
+      return DpadDirection.NONE;
   }
 
   /** This function is called once when the robot is disabled. */

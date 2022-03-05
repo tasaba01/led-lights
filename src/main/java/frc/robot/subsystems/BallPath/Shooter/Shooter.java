@@ -7,7 +7,7 @@ public interface Shooter extends Subsystem, LifecycleListener {
     void findAndCenterTarget();
     void centerTarget(double tx);
     void getDistance(double ty, double angle1, double angle2);
-    // runs flywheel
+    boolean blocking();
     boolean readyToShoot();
     int checkBalls();
     void stopMotors();
