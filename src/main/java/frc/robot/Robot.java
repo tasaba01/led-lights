@@ -260,14 +260,7 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    // this.drive.drivePidTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
     this.drive.drive(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
-    // this.drive.driveTank(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS));
-
-    // Some pid code
-    // this.drive.setSetpoint(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS));
-    // this.drive.drivePidTank();
-    //
 
     DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
     switch (dpadDirection) {

@@ -3,7 +3,6 @@ package frc.robot;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechButton;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechControl;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
-// import ca.team3161.lib.utils.controls.LogitechDualAction.DpadDirection;
 
 public final class ControllerBindings {
     public static final LogitechAxis Y_AXIS = LogitechAxis.Y;
@@ -20,15 +19,4 @@ public final class ControllerBindings {
     public static final LogitechButton SHOOT_LAUNCH_FAR = LogitechButton.Y;
     public static final LogitechButton SHOOT_TARMAC = LogitechButton.B;
 
-    // public static final LogitechButton SHOOT = LogitechButton.RIGHT_TRIGGER;
-
-    // public static final LogitechButton SHOOTLAUNCHFAR = LogitechButton.LEFT_TRIGGER;
-    // public static final LogitechButton SHOOTFENDER = LogitechButton.RIGHT_TRIGGER;
-
-    // public static final LogitechButton CLIMBER_EXTEND = LogitechButton.Y;
-    // public static final LogitechButton CLIMBER_RETRACT = LogitechButton.A;
-    // public static final LogitechButton CLIMBER_ROTATE = LogitechButton.X;
-
-
-    
 }
