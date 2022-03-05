@@ -211,8 +211,8 @@ public class Robot extends TitanBot {
   @Override
   public void teleopSetup() {
     JoystickMode deadbandMode = new DeadbandJoystickMode(0.05);
-    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(deadbandMode));
-    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS, deadbandMode.andThen(x -> x * .75));
+    this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS, deadbandMode.andThen(x -> x * .75));
+    this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(deadbandMode));
     // this.driverPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.startIntake());
     // this.driverPad.bind(ControllerBindings.INTAKE_STOP, PressType.PRESS, () -> this.ballSubsystem.stopIntake());
     // this.driverPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.ballSubsystem.reverseIntake());
@@ -260,20 +260,22 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    this.drive.drive(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS), this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS));
+      double forward = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
+      double turn = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
+      this.drive.drive(forward, turn);
 
-    DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
-    switch (dpadDirection) {
-        case UP:
-            this.elevator.setAction(ElevatorAction.IN);
-            break;
-        case DOWN:
-            this.elevator.setAction(ElevatorAction.OUT);
-            break;
-        default:
-            this.elevator.setAction(ElevatorAction.NONE);
-            break;
-    }
+      DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
+      switch (dpadDirection) {
+          case UP:
+              this.elevator.setAction(ElevatorAction.IN);
+              break;
+          case DOWN:
+              this.elevator.setAction(ElevatorAction.OUT);
+              break;
+          default:
+              this.elevator.setAction(ElevatorAction.NONE);
+              break;
+      }
   }
 
   static DpadDirection angleToDpadDirection(int angle) {
