@@ -19,6 +19,7 @@ import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.InvertedJoystickMode;
 import ca.team3161.lib.utils.controls.JoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
+import ca.team3161.lib.utils.controls.LogitechDualAction.DpadDirection;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -233,11 +234,6 @@ public class Robot extends TitanBot {
     this.operatorPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.intake.setAction(IntakeAction.OUT));
     this.operatorPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.RELEASE, () -> this.intake.setAction(IntakeAction.NONE));
 
-    this.operatorPad.bind(ControllerBindings.ELEVATOR_START, PressType.PRESS, () -> this.elevator.setAction(ElevatorAction.IN));
-    this.operatorPad.bind(ControllerBindings.ELEVATOR_START, PressType.RELEASE, () -> this.elevator.setAction(ElevatorAction.NONE));
-    this.operatorPad.bind(ControllerBindings.ELEVATOR_REVERSE, PressType.PRESS, () -> this.elevator.setAction(ElevatorAction.OUT));
-    this.operatorPad.bind(ControllerBindings.ELEVATOR_REVERSE, PressType.RELEASE, () -> this.elevator.setAction(ElevatorAction.NONE));
-
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
@@ -275,6 +271,29 @@ public class Robot extends TitanBot {
     // Some pid code
     // this.drive.setSetpoint(this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS));
     // this.drive.drivePidTank();
+    //
+
+    DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
+    switch (dpadDirection) {
+        case UP:
+            this.elevator.setAction(ElevatorAction.IN);
+            break;
+        case DOWN:
+            this.elevator.setAction(ElevatorAction.OUT);
+            break;
+        default:
+            this.elevator.setAction(ElevatorAction.NONE);
+            break;
+    }
+  }
+
+  static DpadDirection angleToDpadDirection(int angle) {
+      for (DpadDirection d : DpadDirection.values()) {
+          if (d.getAngle() == angle) {
+              return d;
+          }
+      }
+      return DpadDirection.NONE;
   }
 
   /** This function is called once when the robot is disabled. */

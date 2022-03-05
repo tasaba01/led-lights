@@ -14,8 +14,6 @@ public final class ControllerBindings {
 
     public static final LogitechButton INTAKE_START = LogitechButton.LEFT_TRIGGER;
     public static final LogitechButton INTAKE_REVERSE = LogitechButton.LEFT_BUMPER;
-    public static final LogitechButton ELEVATOR_START = LogitechButton.RIGHT_TRIGGER;
-    public static final LogitechButton ELEVATOR_REVERSE = LogitechButton.RIGHT_BUMPER;
 
     public static final LogitechButton SHOOT_FENDER = LogitechButton.A;
     public static final LogitechButton SHOOT_LAUNCH_CLOSE = LogitechButton.X;
