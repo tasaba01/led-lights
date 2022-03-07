@@ -64,6 +64,7 @@ public class Robot extends TitanBot {
   private Shooter shooter;
   private Climber climberSubsystem;
   private boolean reverseDrive = false;
+  public static final boolean DEBUG = false;
 
   private Autonomous auto;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;

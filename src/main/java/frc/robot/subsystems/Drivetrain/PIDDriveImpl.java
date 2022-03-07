@@ -2,6 +2,8 @@ package frc.robot.subsystems.Drivetrain;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.text.DefaultStyledDocument.ElementSpec;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -13,6 +15,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
+import frc.robot.Robot;
 
 public class PIDDriveImpl extends RepeatingPooledSubsystem implements Drive {
 
@@ -76,14 +79,17 @@ public class PIDDriveImpl extends RepeatingPooledSubsystem implements Drive {
         rightPIDController.setOutputRange(kMinOutput, kMaxOutput);
         rightPIDController.setSmartMotionAllowedClosedLoopError(setpointThreshold, 0);
 
+        if(Robot.DEBUG){
         // display PID coefficients on SmartDashboard
-        // SmartDashboard.putNumber("P Gain", kP);
-        // SmartDashboard.putNumber("I Gain", kI);
-        // SmartDashboard.putNumber("D Gain", kD);
-        // SmartDashboard.putNumber("I Zone", kIz);
-        // SmartDashboard.putNumber("Feed Forward", kFF);
-        // SmartDashboard.putNumber("Max Output", kMaxOutput);
-        // SmartDashboard.putNumber("Min Output", kMinOutput);
+        SmartDashboard.putNumber("P Gain", kP);
+        SmartDashboard.putNumber("I Gain", kI);
+        SmartDashboard.putNumber("D Gain", kD);
+        SmartDashboard.putNumber("I Zone", kIz);
+        SmartDashboard.putNumber("Feed Forward", kFF);
+        SmartDashboard.putNumber("Max Output", kMaxOutput);
+        SmartDashboard.putNumber("Min Output", kMinOutput);
+        }
+        
 
     }
 
@@ -149,24 +155,32 @@ public class PIDDriveImpl extends RepeatingPooledSubsystem implements Drive {
 
     public void drive(double forward, double rotation){
 
+        double p;
+        double i;
+        double d;
+        double iz;
+        double ff;
+        double max;
+        double min;
 
+        if(Robot.DEBUG){
         // read PID coefficients from SmartDashboard
-        // double p = SmartDashboard.getNumber("P Gain", 0);
-        // double i = SmartDashboard.getNumber("I Gain", 0);
-        // double d = SmartDashboard.getNumber("D Gain", 0);
-        // double iz = SmartDashboard.getNumber("I Zone", 0);
-        // double ff = SmartDashboard.getNumber("Feed Forward", 0);
-        // double max = SmartDashboard.getNumber("Max Output", 1);
-        // double min = SmartDashboard.getNumber("Min Output", 0);
-
-        double p = 0;
-        double i = 0;
-        double d = 0;
-        double iz = 0;
-        double ff = 0;
-        double max = 1;
-        double min = 0;
-
+          p = SmartDashboard.getNumber("P Gain", 0);
+          i = SmartDashboard.getNumber("I Gain", 0);
+          d = SmartDashboard.getNumber("D Gain", 0);
+          iz = SmartDashboard.getNumber("I Zone", 0);
+          ff = SmartDashboard.getNumber("Feed Forward", 0);
+          max = SmartDashboard.getNumber("Max Output", 1);
+          min = SmartDashboard.getNumber("Min Output", 0);
+        }else{
+          p = 0;
+          i = 0;
+          d = 0;
+          iz = 0;
+          ff = 0;
+          max = 1;
+          min = 0;
+        }
 
         // if PID coefficients on SmartDashboard have changed, write new values to controller
         
