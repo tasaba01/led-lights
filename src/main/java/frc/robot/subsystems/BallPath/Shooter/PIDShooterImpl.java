@@ -77,12 +77,12 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         turretEncoderReadingPosition = this.turretMotor.getSelectedSensorPosition();
         turretEncoderReadingVelocity = this.turretMotor.getSelectedSensorVelocity();
 
-        SmartDashboard.putNumber("Shooter Encoder reading position", shooterEncoderReadingPosition);
-        SmartDashboard.putNumber("Shooter Encoder Reading Velocity", shooterEncoderReadingVelocity);
-        SmartDashboard.putNumber("Turret Encoder Reading Position", turretEncoderReadingPosition);
-        SmartDashboard.putNumber("Turret Encoder Reading Velocity", turretEncoderReadingVelocity);
-        SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
-        SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
+        // SmartDashboard.putNumber("Shooter Encoder reading position", shooterEncoderReadingPosition);
+        // SmartDashboard.putNumber("Shooter Encoder Reading Velocity", shooterEncoderReadingVelocity);
+        // SmartDashboard.putNumber("Turret Encoder Reading Position", turretEncoderReadingPosition);
+        // SmartDashboard.putNumber("Turret Encoder Reading Velocity", turretEncoderReadingVelocity);
+        // SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
+        // SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
 
         switch (this.requestedPosition) {
             case TARMAC:
@@ -156,8 +156,8 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
             currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooterPID);
             currentOutput += 0.01; // hack "feed forward"
             currentOutput = Utils.normalizePwm(currentOutput);
-            SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooterPID);
-            SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
+            // SmartDashboard.putNumber("Setpoint for the shooter is: ", setPointShooterPID);
+            // SmartDashboard.putNumber("Current Output is: ", shooterEncoderReadingVelocity);
         } else {
             currentOutput = 0;
         }

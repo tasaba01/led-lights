@@ -63,6 +63,7 @@ public class Robot extends TitanBot {
   private Elevator elevator;
   private Shooter shooter;
   private Climber climberSubsystem;
+  private boolean reverseDrive = false;
 
   private Autonomous auto;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
@@ -115,6 +116,8 @@ public class Robot extends TitanBot {
     // Encoder rightEncoder = new Encoder(RobotMap.RIGHT_ENCODER_PORTS[0], RobotMap.RIGHT_ENCODER_PORTS[1], false, Encoder.EncodingType.k2X);
     RelativeEncoder leftEncoderPrimary = leftControllerPrimary.getEncoder();
     RelativeEncoder rightEncoderPrimary = rightControllerPrimary.getEncoder();
+
+    
 
     this.drive = new RawDriveImpl(leftControllerPrimary, rightControllerPrimary, leftEncoderPrimary, rightEncoderPrimary);
 
@@ -251,6 +254,9 @@ public class Robot extends TitanBot {
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
+    this.operatorPad.bind(ControllerBindings.DRIVE_REVERSE, PressType.PRESS, () -> reverseDrive = true);
+    this.operatorPad.bind(ControllerBindings.DRIVE_REVERSE, PressType.RELEASE, () -> reverseDrive = false);
+
     this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.PRESS, () -> this.shooter.resetSensors());
     this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
@@ -284,8 +290,16 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-      double forward = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
-      double turn = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
+      double forward, turn;
+
+      if(reverseDrive){
+        forward = -this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
+        turn = -this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
+      }else{
+        forward = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
+        turn = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
+      }
+
       this.drive.drive(forward, turn);
 
       DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());

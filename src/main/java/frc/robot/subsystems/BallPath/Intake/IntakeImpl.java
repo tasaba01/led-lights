@@ -50,7 +50,7 @@ public class IntakeImpl extends RepeatingPooledSubsystem implements Intake {
     @Override
     public void task() throws Exception {
         double sensorReading = this.intakeSensor.getRangeInches();
-        SmartDashboard.putNumber("Intake ultrasonic", sensorReading);
+        // SmartDashboard.putNumber("Intake ultrasonic", sensorReading);
         this.sensorSamples.add(sensorReading);
         if (sensorSamples.size() > SAMPLE_COUNT) {
             this.sensorSamples.remove();

@@ -66,12 +66,12 @@ public class RawShooterImpl extends RepeatingPooledSubsystem implements Shooter 
         turretEncoderReadingPosition = this.turretMotor.getSelectedSensorPosition();
         turretEncoderReadingVelocity = this.turretMotor.getSelectedSensorVelocity();
 
-        SmartDashboard.putNumber("Shooter Encoder reading position", shooterEncoderReadingPosition);
-        SmartDashboard.putNumber("Shooter Encoder Reading Velocity", shooterEncoderReadingVelocity);
-        SmartDashboard.putNumber("Turret Encoder Reading Position", turretEncoderReadingPosition);
-        SmartDashboard.putNumber("Turret Encoder Reading Velocity", turretEncoderReadingVelocity);
-        SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
-        SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
+        // SmartDashboard.putNumber("Shooter Encoder reading position", shooterEncoderReadingPosition);
+        // SmartDashboard.putNumber("Shooter Encoder Reading Velocity", shooterEncoderReadingVelocity);
+        // SmartDashboard.putNumber("Turret Encoder Reading Position", turretEncoderReadingPosition);
+        // SmartDashboard.putNumber("Turret Encoder Reading Velocity", turretEncoderReadingVelocity);
+        // SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
+        // SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
 
         switch (this.requestedPosition) {
             case TARMAC:

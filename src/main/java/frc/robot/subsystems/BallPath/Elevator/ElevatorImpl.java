@@ -55,7 +55,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     public void task() throws Exception {
 
         double sensorReading = this.sensor.getRangeInches();
-        SmartDashboard.putNumber("Elevator Ultrasonic", sensorReading);
+        // SmartDashboard.putNumber("Elevator Ultrasonic", sensorReading);
         this.sensorSamples.add(sensorReading);
         if (sensorSamples.size() > SAMPLE_COUNT) {
             this.sensorSamples.remove();

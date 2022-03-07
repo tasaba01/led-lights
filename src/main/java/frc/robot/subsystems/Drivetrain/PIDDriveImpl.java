@@ -77,13 +77,13 @@ public class PIDDriveImpl extends RepeatingPooledSubsystem implements Drive {
         rightPIDController.setSmartMotionAllowedClosedLoopError(setpointThreshold, 0);
 
         // display PID coefficients on SmartDashboard
-        SmartDashboard.putNumber("P Gain", kP);
-        SmartDashboard.putNumber("I Gain", kI);
-        SmartDashboard.putNumber("D Gain", kD);
-        SmartDashboard.putNumber("I Zone", kIz);
-        SmartDashboard.putNumber("Feed Forward", kFF);
-        SmartDashboard.putNumber("Max Output", kMaxOutput);
-        SmartDashboard.putNumber("Min Output", kMinOutput);
+        // SmartDashboard.putNumber("P Gain", kP);
+        // SmartDashboard.putNumber("I Gain", kI);
+        // SmartDashboard.putNumber("D Gain", kD);
+        // SmartDashboard.putNumber("I Zone", kIz);
+        // SmartDashboard.putNumber("Feed Forward", kFF);
+        // SmartDashboard.putNumber("Max Output", kMaxOutput);
+        // SmartDashboard.putNumber("Min Output", kMinOutput);
 
     }
 
@@ -151,13 +151,22 @@ public class PIDDriveImpl extends RepeatingPooledSubsystem implements Drive {
 
 
         // read PID coefficients from SmartDashboard
-        double p = SmartDashboard.getNumber("P Gain", 0);
-        double i = SmartDashboard.getNumber("I Gain", 0);
-        double d = SmartDashboard.getNumber("D Gain", 0);
-        double iz = SmartDashboard.getNumber("I Zone", 0);
-        double ff = SmartDashboard.getNumber("Feed Forward", 0);
-        double max = SmartDashboard.getNumber("Max Output", 1);
-        double min = SmartDashboard.getNumber("Min Output", 0);
+        // double p = SmartDashboard.getNumber("P Gain", 0);
+        // double i = SmartDashboard.getNumber("I Gain", 0);
+        // double d = SmartDashboard.getNumber("D Gain", 0);
+        // double iz = SmartDashboard.getNumber("I Zone", 0);
+        // double ff = SmartDashboard.getNumber("Feed Forward", 0);
+        // double max = SmartDashboard.getNumber("Max Output", 1);
+        // double min = SmartDashboard.getNumber("Min Output", 0);
+
+        double p = 0;
+        double i = 0;
+        double d = 0;
+        double iz = 0;
+        double ff = 0;
+        double max = 1;
+        double min = 0;
+
 
         // if PID coefficients on SmartDashboard have changed, write new values to controller
         
@@ -195,10 +204,10 @@ public class PIDDriveImpl extends RepeatingPooledSubsystem implements Drive {
         leftPIDController.setReference(leftSetPoint, CANSparkMax.ControlType.kVelocity);
         rightPIDController.setReference(rightSetPoint, CANSparkMax.ControlType.kVelocity);
         
-        SmartDashboard.putNumber("Left SetPoint", leftSetPoint);
-        SmartDashboard.putNumber("Right SetPoint", leftSetPoint);
-        SmartDashboard.putNumber("Left Encoder Velocity", leftEncoder.getVelocity());
-        SmartDashboard.putNumber("Right Encoder Velocity", rightEncoder.getVelocity());
+        // SmartDashboard.putNumber("Left SetPoint", leftSetPoint);
+        // SmartDashboard.putNumber("Right SetPoint", leftSetPoint);
+        // SmartDashboard.putNumber("Left Encoder Velocity", leftEncoder.getVelocity());
+        // SmartDashboard.putNumber("Right Encoder Velocity", rightEncoder.getVelocity());
 
 
         
