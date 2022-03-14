@@ -79,8 +79,8 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
 
         // SmartDashboard.putNumber("Shooter Encoder reading position", shooterEncoderReadingPosition);
         // SmartDashboard.putNumber("Shooter Encoder Reading Velocity", shooterEncoderReadingVelocity);
-        // SmartDashboard.putNumber("Turret Encoder Reading Position", turretEncoderReadingPosition);
-        // SmartDashboard.putNumber("Turret Encoder Reading Velocity", turretEncoderReadingVelocity);
+        SmartDashboard.putNumber("Turret Encoder Reading Position", turretEncoderReadingPosition);
+        SmartDashboard.putNumber("Turret Encoder Reading Velocity", turretEncoderReadingVelocity);
         // SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
         // SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
 
@@ -92,11 +92,11 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 setPointRotation = 0; // will probably still be 0 for the auto shot
                 break;
             case FENDER:
-                setPointHood = 99_000;
+                setPointHood = 0;
                 // setPointHood = 100_000;
-                setPointShooterPID = 5_300; // tbd
+                setPointShooterPID = 2500; // tbd
                 // setPointShooterPID = 0.35;
-                setPointRotation = 0;
+                setPointRotation = 00;
                 break;
             case LAUNCHPAD_CLOSE:
                 setPointHood = 0; // to be decided

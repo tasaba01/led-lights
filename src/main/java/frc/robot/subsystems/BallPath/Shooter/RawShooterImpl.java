@@ -35,7 +35,7 @@ public class RawShooterImpl extends RepeatingPooledSubsystem implements Shooter 
 
     private final double hoodBuffer = 18_000;
     private final double turretBuffer = 30000;
-    private final double turretSpeed = 0.3;
+    private final double turretSpeed = 0.15;
     private final double hoodSpeed = 1;
 
     public RawShooterImpl(TalonSRX turretMotor, TalonFX shooterMotor, TalonSRX hoodMotor) {
@@ -82,7 +82,7 @@ public class RawShooterImpl extends RepeatingPooledSubsystem implements Shooter 
             case FENDER:
                 setPointHood = 100_000;
                 setPointShooter = 0.35; // tbd
-                setPointRotation = 0;
+                setPointRotation = 100000;
                 break;
             case LAUNCHPAD_CLOSE:
                 setPointHood = 0; // to be decided
@@ -104,6 +104,12 @@ public class RawShooterImpl extends RepeatingPooledSubsystem implements Shooter 
             case TEST:
                 setPointShooter = 0.2;
                 setPointHood = 100_000;
+                break;
+            case TEST2:
+                setPointRotation = 100000;
+                setPointShooter = 0;
+                setPointHood = 0;
+                System.out.println("Setting shot position");
                 break;
             default:
                 break;

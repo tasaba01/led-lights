@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
@@ -22,12 +23,15 @@ import ca.team3161.lib.utils.controls.InvertedJoystickMode;
 import ca.team3161.lib.utils.controls.JoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.LogitechDualAction.DpadDirection;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.subsystems.BallPath.BallPath;
 import frc.robot.subsystems.BallPath.BallPathImpl;
+import frc.robot.subsystems.BallPath.BallPath.BallAction;
 import frc.robot.subsystems.BallPath.Elevator.Elevator;
 import frc.robot.subsystems.BallPath.Elevator.Elevator.ElevatorAction;
 import frc.robot.subsystems.BallPath.Elevator.ElevatorImpl;
@@ -65,9 +69,13 @@ public class Robot extends TitanBot {
   private Climber climberSubsystem;
   private boolean reverseDrive = false;
   public static final boolean DEBUG = false;
+  double turretEncoderReadingPosition;
+  double turretEncoderReadingVelocity;
 
   private Autonomous auto;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
+  private final I2C.Port i2cPort = I2C.Port.kOnboard;
+  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
 
   @Override
   public int getAutonomousPeriodLengthSeconds() {
@@ -79,6 +87,7 @@ public class Robot extends TitanBot {
    */
   @Override
   public void robotSetup() {
+    System.out.println("Robot setup start");
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
@@ -158,6 +167,7 @@ public class Robot extends TitanBot {
     registerLifecycleComponent(elevator);
     registerLifecycleComponent(shooter);
     registerLifecycleComponent(ballSubsystem);
+    System.out.println("Robot setup complete");
   }
 
   /**
@@ -168,7 +178,10 @@ public class Robot extends TitanBot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    // System.out.println("Robot periodic run");
+
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -230,6 +243,7 @@ public class Robot extends TitanBot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopSetup() {
+    System.out.println("telleop setup");
     JoystickMode deadbandMode = new DeadbandJoystickMode(0.05);
     this.driverPad.setMode(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS, deadbandMode.andThen(x -> x * .75));
     this.driverPad.setMode(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS, new InvertedJoystickMode().andThen(deadbandMode));
@@ -247,8 +261,8 @@ public class Robot extends TitanBot {
     // this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
     // this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.ballSubsystem.);
 
-    this.operatorPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.intake.setAction(IntakeAction.IN));
-    this.operatorPad.bind(ControllerBindings.INTAKE_START, PressType.RELEASE, () -> this.intake.setAction(IntakeAction.NONE));
+    this.operatorPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.INDEX));
+    this.operatorPad.bind(ControllerBindings.INTAKE_START, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
     this.operatorPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.intake.setAction(IntakeAction.OUT));
     this.operatorPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.RELEASE, () -> this.intake.setAction(IntakeAction.NONE));
 
@@ -264,8 +278,10 @@ public class Robot extends TitanBot {
     this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.NONE/*LAUNCHPAD_FAR*/));
     this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.TARMAC));
+    this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.TEST2));
     this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+    this.operatorPad.bind(ControllerBindings.RUN_ELEVATOR, PressType.PRESS, () -> this.elevator.setAction(ElevatorAction.RUN));
+    this.operatorPad.bind(ControllerBindings.RUN_ELEVATOR, PressType.RELEASE, () -> this.elevator.setAction(ElevatorAction.NONE));
 
     // this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
     //   if (pressed) {
@@ -286,21 +302,25 @@ public class Robot extends TitanBot {
     elevator.start();
     shooter.start();
     ballSubsystem.start();
-  }
 
+
+  }
+  TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
+  TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
+    System.out.println("teleop routine");
       double forward, turn;
 
-      if(reverseDrive){
-        forward = -this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
-        turn = -this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
-      }else{
-        forward = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
-        turn = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
-      }
-
+      // if(reverseDrive){
+      //   forward = -this.operatorPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
+      //   turn = -this.operatorPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
+      // }else{
+        forward = -this.operatorPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS);
+        turn = this.operatorPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS);
+      // }
+      
       this.drive.drive(forward, turn);
 
       DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
@@ -315,7 +335,11 @@ public class Robot extends TitanBot {
               this.elevator.setAction(ElevatorAction.NONE);
               break;
       }
-  }
+      turretEncoderReadingPosition = this.turretMotor.getSelectedSensorPosition();
+      turretEncoderReadingVelocity = this.turretMotor.getSelectedSensorVelocity();
+      SmartDashboard.putNumber("velocity ", turretEncoderReadingVelocity);
+      SmartDashboard.putNumber("position ", turretEncoderReadingPosition);
+      }
 
   static DpadDirection angleToDpadDirection(int angle) {
       for (DpadDirection d : DpadDirection.values()) {
