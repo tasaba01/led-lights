@@ -269,19 +269,22 @@ public class Robot extends TitanBot {
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-    this.operatorPad.bind(ControllerBindings.DRIVE_REVERSE, PressType.PRESS, () -> reverseDrive = true);
-    this.operatorPad.bind(ControllerBindings.DRIVE_REVERSE, PressType.RELEASE, () -> reverseDrive = false);
+    this.operatorPad.bind(ControllerBindings.SHOOT_GENERAL, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.GENERAL));
+    this.operatorPad.bind(ControllerBindings.SHOOT_GENERAL, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.PRESS, () -> this.shooter.resetSensors());
-    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+    // this.operatorPad.bind(ControllerBindings.DRIVE_REVERSE, PressType.PRESS, () -> reverseDrive = true);
+    // this.operatorPad.bind(ControllerBindings.DRIVE_REVERSE, PressType.RELEASE, () -> reverseDrive = false);
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.NONE/*LAUNCHPAD_FAR*/));
-    this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+    // this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.PRESS, () -> this.shooter.resetSensors());
+    // this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_CLOSE, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.TEST2));
-    this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
-    this.operatorPad.bind(ControllerBindings.RUN_ELEVATOR, PressType.PRESS, () -> this.elevator.setAction(ElevatorAction.RUN));
-    this.operatorPad.bind(ControllerBindings.RUN_ELEVATOR, PressType.RELEASE, () -> this.elevator.setAction(ElevatorAction.NONE));
+    // this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.NONE/*LAUNCHPAD_FAR*/));
+    // this.operatorPad.bind(ControllerBindings.SHOOT_LAUNCH_FAR, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+
+    // this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.TEST2));
+    // this.operatorPad.bind(ControllerBindings.SHOOT_TARMAC, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+    // this.operatorPad.bind(ControllerBindings.RUN_ELEVATOR, PressType.PRESS, () -> this.elevator.setAction(ElevatorAction.RUN));
+    // this.operatorPad.bind(ControllerBindings.RUN_ELEVATOR, PressType.RELEASE, () -> this.elevator.setAction(ElevatorAction.NONE));
 
     // this.operatorPad.bind(ControllerBindings.SHOOTLAUNCHFAR, pressed -> {
     //   if (pressed) {
@@ -312,13 +315,10 @@ public class Robot extends TitanBot {
   public void teleopRoutine() {
       double forward, turn;
 
-      // if(reverseDrive){
-      //   forward = -this.operatorPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
-      //   turn = -this.operatorPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
-      // }else{
-        forward = -this.operatorPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS);
-        turn = this.operatorPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS);
-      // }
+
+      forward = -this.operatorPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS);
+      turn = this.operatorPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS);
+
       
       this.drive.drive(forward, turn);
 

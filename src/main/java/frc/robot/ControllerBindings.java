@@ -15,7 +15,7 @@ public final class ControllerBindings {
     public static final LogitechButton OUTTAKE = LogitechButton.RIGHT_TRIGGER;
 
     public static final LogitechButton SHOOT_FENDER = LogitechButton.A;
-    public static final LogitechButton SHOOT_LAUNCH_FAR = LogitechButton.X;
+    public static final LogitechButton SHOOT_GENERAL = LogitechButton.X;
     public static final LogitechButton SHOOT_LAUNCH_CLOSE = LogitechButton.RIGHT_BUMPER;
     public static final LogitechButton SHOOT_TARMAC = LogitechButton.B;
     public static final LogitechButton RUN_ELEVATOR = LogitechButton.Y;

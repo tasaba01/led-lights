@@ -83,6 +83,7 @@ public class RawShooterImpl extends RepeatingPooledSubsystem implements Shooter 
                 setPointHood = 100_000;
                 setPointShooter = 0.35; // tbd
                 setPointRotation = 100000;
+                System.out.println("USING THE RAW SHOOTER IMPL");
                 break;
             case LAUNCHPAD_CLOSE:
                 setPointHood = 0; // to be decided

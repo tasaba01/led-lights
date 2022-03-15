@@ -94,6 +94,22 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
             //         }
             //     }
             //     break;
+            case SHOOTGENERAL:
+                this.shooter.setShotPosition(ShotPosition.GENERAL);
+                if(shooter.readyToShoot()){
+                    elevator.setAction(ElevatorAction.PRIME);
+                }else{
+                    elevator.setAction(ElevatorAction.NONE);
+                }
+                break;
+            case SHOOTFENDER:
+                this.shooter.setShotPosition(ShotPosition.FENDER);
+                if(shooter.readyToShoot()){
+                    elevator.setAction(ElevatorAction.PRIME);
+                }else{
+                    elevator.setAction(ElevatorAction.NONE);
+                }
+                break;
             case NONE:
                 this.intake.setAction(IntakeAction.STOP);
                 this.elevator.setAction(ElevatorAction.STOP);

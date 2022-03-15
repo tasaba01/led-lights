@@ -1,5 +1,8 @@
 package frc.robot.subsystems.BallPath.Shooter;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -12,6 +15,11 @@ import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import ca.team3161.lib.utils.Utils;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
+
 
 public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Shooter {
 
@@ -46,6 +54,27 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
     private final double hoodSpeed = 0.5;
 
     private final PIDController shooterPid;
+    boolean CenterUsingLimelight = false;
+
+    // LIMELIGHT STUFF
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+
+    NetworkTableEntry tx = table.getEntry("tx");
+    NetworkTableEntry ty = table.getEntry("ty");
+    NetworkTableEntry ta = table.getEntry("ta");
+    NetworkTableEntry targetSkew = table.getEntry("ts");
+    double x, y, a, totalAngle, rs, totalDistance, totalAngleRadians;
+
+    double a1 = 35; // angle of limelight
+    double a2 = y;
+    double h2 = 103; // HEIGHT OF TARGET
+    double h1 = 35; // HEIGHT OF LIMELIGHT
+
+    double heightDif = h2 - h1;
+    
+    
+
+    
 
     public PIDShooterImpl(TalonSRX turretMotor, TalonFX shooterMotor, TalonSRX hoodMotor) {
         super(10, TimeUnit.MILLISECONDS);
@@ -68,6 +97,72 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         this.requestedPosition = shotPosition;
     }
 
+    public double getSetpointHood(double distance){
+        double hoodDif, distDif, difFromUpper, percentToAdd, amountToAdd;
+        double returnAmount = 0;
+        Integer Fender = 100_000;
+        Integer Tarmac = 230_000;
+        Integer CloseLaunchPad = 300_000; // pls test
+        Integer FarLaunchPad = 330_000; // pls test
+        Integer HumanPlayer = 400_000; // pls test
+        double[] Distances = {55.0, 153.0, 202.95, 244.77, 305.66};
+        Integer[] HoodValues = {100_000, 230_000, 300_000, 330_000, 400_000};
+
+        // LinkedHashMap<Double, Integer> foundValues = new LinkedHashMap<>();
+        // foundValues.put(55.0, Fender);
+        // foundValues.put(153.0, Tarmac);
+        // foundValues.put(202.95, CloseLaunchPad);
+        // foundValues.put(244.77, FarLaunchPad);
+        // foundValues.put(305.66, HumanPlayer);
+        int i = 0;
+        for (Double key : Distances) {
+            if(distance < key){
+                distDif = Distances[i] - Distances[i-1];
+                hoodDif = HoodValues[i] - HoodValues[i-1];
+                difFromUpper = Distances[i] - distance;
+                percentToAdd = difFromUpper / distDif;
+                amountToAdd = percentToAdd * hoodDif;
+                returnAmount = amountToAdd + HoodValues[i-1];
+                break;
+            }
+            i+=1;
+        }
+        return returnAmount;
+    }
+
+    public double getSetpointWheel(Double distance){
+        double WheelDif, distDif, difFromUpper, percentToAdd, amountToAdd;
+        double returnAmount = 0;
+        Integer Fender = 3_500;
+        Integer Tarmac = 5_400;
+        Integer CloseLaunchPad = 7_000; // pls test
+        Integer FarLaunchPad = 8_000; // pls test
+        Integer HumanPlayer = 10_000; // pls test
+        // HashMap<Double, Integer> foundValues = new HashMap<>();
+        // foundValues.put(55.0, Fender);
+        // foundValues.put(153.0, Tarmac);
+        // foundValues.put(202.95, CloseLaunchPad);
+        // foundValues.put(244.77, FarLaunchPad);
+        // foundValues.put(305.66, HumanPlayer);
+        double[] Distances = {55.0, 153.0, 202.95, 244.77, 305.66};
+        Integer[] WheelValues = {3_500, 5_400, 7_000, 8_000, 10_000};
+        int i = 0;
+        for (Double key : Distances) {
+            if(distance < key){
+                distDif = Distances[i] - Distances[i-1];
+                WheelDif = WheelValues[i] - WheelValues[i-1];
+                difFromUpper = Distances[i] - distance;
+                percentToAdd = difFromUpper / distDif;
+                amountToAdd = percentToAdd * WheelDif;
+                returnAmount = amountToAdd + WheelValues[i-1];
+                break;
+            }
+            i+=1;
+        }
+        return returnAmount;
+    }
+
+
     @Override
     public void task(){
         shooterEncoderReadingPosition = shooterMotor.getSelectedSensorPosition();
@@ -85,31 +180,30 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         // SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
 
         switch (this.requestedPosition) {
-            case TARMAC:
-                setPointHood = 230_000; // to be decided
-                setPointShooterPID = 5_400; // tbd
-                // setPointShooterPID = 0.45;
-                setPointRotation = 0; // will probably still be 0 for the auto shot
-                break;
             case FENDER:
-                setPointHood = 0;
-                // setPointHood = 100_000;
-                setPointShooterPID = 2500; // tbd
-                // setPointShooterPID = 0.35;
-                setPointRotation = 00;
+                setPointHood = 100_000;
+                setPointShooterPID = 3500; 
+                setPointRotation = 0;
+                CenterUsingLimelight = false;
                 break;
-            case LAUNCHPAD_CLOSE:
-                setPointHood = 0; // to be decided
-                setPointShooterPID = 0; // tbd
-                setPointRotation = 0; // tbd
-                break;
-            case LAUNCHPAD_FAR:
-                // setPointHood = 300000;
-                setPointHood = 0;
-                setPointShooterPID = 0; // tbd
-                setPointRotation = 200000;
+            case GENERAL:
+                CenterUsingLimelight = true;
+                tx = table.getEntry("tx");
+                ty = table.getEntry("ty");
+                ta = table.getEntry("ta");
+                x = tx.getDouble(0.0);
+                y = ty.getDouble(0.0);
+                a = ta.getDouble(0.0);
+                totalAngle = a1+a2;
+                totalAngleRadians = totalAngle * (3.14159 / 180.0);
+                rs = Math.tan(totalAngleRadians);
+                totalDistance = heightDif / rs;
+                System.out.println(totalDistance);
+                setPointHood = getSetpointHood(totalDistance);
+                setPointShooterPID = getSetpointWheel(totalDistance);
                 break;
             case NONE:
+                CenterUsingLimelight = false;
                 setPointShooterPID = 0;
                 setPointHood = 0;
                 setPointRotation = 0;
@@ -117,8 +211,10 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 turretReady = false;
                 break;
             case TEST:
-                setPointShooterPID = 3000;
-                setPointHood = 100_000;
+                CenterUsingLimelight = false;
+                setPointShooterPID = 0;
+                setPointHood = 0;
+                setPointRotation = 0;
                 break;
             default:
                 break;
@@ -138,19 +234,33 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
             hoodReady = false;
         }
 
-        if (setPointRotation == Double.NEGATIVE_INFINITY) {
-            turretMotor.set(ControlMode.PercentOutput, 0);
-            turretReady = false;
-        } else if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
-            turretMotor.set(ControlMode.PercentOutput, 0);
-            turretReady = true;
-        }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
-            turretMotor.set(ControlMode.PercentOutput, turretSpeed);
-            turretReady = false;
-        }else if (turretEncoderReadingPosition >= setPointRotation + turretBuffer){
-            turretMotor.set(ControlMode.PercentOutput, -turretSpeed);
-            turretReady = false;
+        if(!CenterUsingLimelight){
+            if (setPointRotation == Double.NEGATIVE_INFINITY) {
+                turretMotor.set(ControlMode.PercentOutput, 0);
+                turretReady = false;
+            } else if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
+                turretMotor.set(ControlMode.PercentOutput, 0);
+                turretReady = true;
+            }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
+                turretMotor.set(ControlMode.PercentOutput, turretSpeed);
+                turretReady = false;
+            }else if (turretEncoderReadingPosition >= setPointRotation + turretBuffer){
+                turretMotor.set(ControlMode.PercentOutput, -turretSpeed);
+                turretReady = false;
+            }
+        }else{
+            if(x < 1 && x > -1){
+                turretMotor.set(ControlMode.PercentOutput, 0);
+                turretReady = true;
+            }else if(x > 1){
+                turretMotor.set(ControlMode.PercentOutput, turretSpeed);
+                turretReady = false;
+            }else if(x>-1){
+                turretMotor.set(ControlMode.PercentOutput, -turretSpeed);
+                turretReady = false;
+            }
         }
+
 
         if(setPointShooterPID != 0){
             currentOutput = shooterPid.calculate(shooterEncoderReadingVelocity, setPointShooterPID);
