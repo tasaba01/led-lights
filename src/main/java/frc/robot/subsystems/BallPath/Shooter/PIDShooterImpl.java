@@ -54,7 +54,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
     private final double hoodSpeed = 0.5;
 
     private final PIDController shooterPid;
-    boolean CenterUsingLimelight = false;
+    boolean centerUsingLimelight = false;
 
     // LIMELIGHT STUFF
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -100,13 +100,13 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
     public double getSetpointHood(double distance){
         double hoodDif, distDif, difFromUpper, percentToAdd, amountToAdd;
         double returnAmount = 0;
-        Integer Fender = 100_000;
-        Integer Tarmac = 230_000;
-        Integer CloseLaunchPad = 300_000; // pls test
-        Integer FarLaunchPad = 330_000; // pls test
-        Integer HumanPlayer = 400_000; // pls test
-        double[] Distances = {55.0, 153.0, 202.95, 244.77, 305.66};
-        Integer[] HoodValues = {100_000, 230_000, 300_000, 330_000, 400_000};
+        // Integer Fender = 100_000;
+        // Integer Tarmac = 230_000;
+        // Integer CloseLaunchPad = 300_000; // pls test
+        // Integer FarLaunchPad = 330_000; // pls test
+        // Integer HumanPlayer = 400_000; // pls test
+        double[] distances = {55.0, 153.0, 202.95, 244.77, 305.66};
+        Integer[] hoodValues = {100_000, 230_000, 300_000, 330_000, 400_000};
 
         // LinkedHashMap<Double, Integer> foundValues = new LinkedHashMap<>();
         // foundValues.put(55.0, Fender);
@@ -114,15 +114,15 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         // foundValues.put(202.95, CloseLaunchPad);
         // foundValues.put(244.77, FarLaunchPad);
         // foundValues.put(305.66, HumanPlayer);
-        int i = 0;
-        for (Double key : Distances) {
-            if(distance < key){
-                distDif = Distances[i] - Distances[i-1];
-                hoodDif = HoodValues[i] - HoodValues[i-1];
-                difFromUpper = Distances[i] - distance;
+        for (int i = 0; i < distances.length; i++) {
+            double key = distances[i];
+            if(distance < key && i != 0){
+                distDif = distances[i] - distances[i-1];
+                hoodDif = hoodValues[i] - hoodValues[i-1];
+                difFromUpper = distances[i] - distance;
                 percentToAdd = difFromUpper / distDif;
                 amountToAdd = percentToAdd * hoodDif;
-                returnAmount = amountToAdd + HoodValues[i-1];
+                returnAmount = amountToAdd + hoodValues[i-1];
                 break;
             }
             i+=1;
@@ -131,30 +131,31 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
     }
 
     public double getSetpointWheel(Double distance){
-        double WheelDif, distDif, difFromUpper, percentToAdd, amountToAdd;
+        double wheelDif, distDif, difFromUpper, percentToAdd, amountToAdd;
         double returnAmount = 0;
-        Integer Fender = 3_500;
-        Integer Tarmac = 5_400;
-        Integer CloseLaunchPad = 7_000; // pls test
-        Integer FarLaunchPad = 8_000; // pls test
-        Integer HumanPlayer = 10_000; // pls test
+        // Integer Fender = 3_500;
+        // Integer Tarmac = 5_400;
+        // Integer CloseLaunchPad = 7_000; // pls test
+        // Integer FarLaunchPad = 8_000; // pls test
+        // Integer HumanPlayer = 10_000; // pls test
         // HashMap<Double, Integer> foundValues = new HashMap<>();
         // foundValues.put(55.0, Fender);
         // foundValues.put(153.0, Tarmac);
         // foundValues.put(202.95, CloseLaunchPad);
         // foundValues.put(244.77, FarLaunchPad);
         // foundValues.put(305.66, HumanPlayer);
-        double[] Distances = {55.0, 153.0, 202.95, 244.77, 305.66};
-        Integer[] WheelValues = {3_500, 5_400, 7_000, 8_000, 10_000};
-        int i = 0;
-        for (Double key : Distances) {
-            if(distance < key){
-                distDif = Distances[i] - Distances[i-1];
-                WheelDif = WheelValues[i] - WheelValues[i-1];
-                difFromUpper = Distances[i] - distance;
+        double[] distances = {55.0, 153.0, 202.95, 244.77, 305.66};
+        Integer[] wheelValues = {3_500, 5_400, 7_000, 8_000, 10_000};
+    
+        for (int i = 0; i < distances.length; i++) {
+            double key = distances[i];
+            if(distance < key && i != 0){
+                distDif = distances[i] - distances[i-1];
+                wheelDif = wheelValues[i] - wheelValues[i-1];
+                difFromUpper = distances[i] - distance;
                 percentToAdd = difFromUpper / distDif;
-                amountToAdd = percentToAdd * WheelDif;
-                returnAmount = amountToAdd + WheelValues[i-1];
+                amountToAdd = percentToAdd * wheelDif;
+                returnAmount = amountToAdd + wheelValues[i-1];
                 break;
             }
             i+=1;
@@ -184,10 +185,10 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 setPointHood = 100_000;
                 setPointShooterPID = 3500; 
                 setPointRotation = 0;
-                CenterUsingLimelight = false;
+                centerUsingLimelight = false;
                 break;
             case GENERAL:
-                CenterUsingLimelight = true;
+                centerUsingLimelight = true;
                 tx = table.getEntry("tx");
                 ty = table.getEntry("ty");
                 ta = table.getEntry("ta");
@@ -195,7 +196,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 y = ty.getDouble(0.0);
                 a = ta.getDouble(0.0);
                 totalAngle = a1+a2;
-                totalAngleRadians = totalAngle * (3.14159 / 180.0);
+                totalAngleRadians = Math.toRadians(totalAngle);
                 rs = Math.tan(totalAngleRadians);
                 totalDistance = heightDif / rs;
                 System.out.println(totalDistance);
@@ -203,7 +204,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 setPointShooterPID = getSetpointWheel(totalDistance);
                 break;
             case NONE:
-                CenterUsingLimelight = false;
+                centerUsingLimelight = false;
                 setPointShooterPID = 0;
                 setPointHood = 0;
                 setPointRotation = 0;
@@ -211,7 +212,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 turretReady = false;
                 break;
             case TEST:
-                CenterUsingLimelight = false;
+                centerUsingLimelight = false;
                 setPointShooterPID = 0;
                 setPointHood = 0;
                 setPointRotation = 0;
@@ -234,7 +235,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
             hoodReady = false;
         }
 
-        if(!CenterUsingLimelight){
+        if(!centerUsingLimelight){
             if (setPointRotation == Double.NEGATIVE_INFINITY) {
                 turretMotor.set(ControlMode.PercentOutput, 0);
                 turretReady = false;

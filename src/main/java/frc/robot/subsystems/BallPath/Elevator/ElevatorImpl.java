@@ -29,13 +29,13 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     private volatile ElevatorAction action = ElevatorAction.NONE;
     private boolean lastPresent = false;
     private final Queue<Double> sensorSamples;
-    private final I2C.Port i2cPort = I2C.Port.kOnboard;
-    private final ColorSensorV3 elevatorColorSensor = new ColorSensorV3(i2cPort);
+    private final ColorSensorV3 elevatorColorSensor;
     boolean ballPresent = false;
     int detectedColorElevator = 0;
 
-    public ElevatorImpl(WPI_TalonSRX elevator, Ultrasonic sensor, Shooter shooter) {
+    public ElevatorImpl(WPI_TalonSRX elevator, Ultrasonic sensor, Shooter shooter, ColorSensorV3 elevatorColorSensor) {
         super(20, TimeUnit.MILLISECONDS);
+        this.elevatorColorSensor = elevatorColorSensor;
         this.elevator = elevator;
         this.sensor = sensor;
         this.shooter = shooter;

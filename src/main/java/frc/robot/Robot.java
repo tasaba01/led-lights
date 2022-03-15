@@ -74,8 +74,7 @@ public class Robot extends TitanBot {
 
   private Autonomous auto;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
-  private final I2C.Port i2cPort = I2C.Port.kOnboard;
-  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+
 
   @Override
   public int getAutonomousPeriodLengthSeconds() {
@@ -127,6 +126,9 @@ public class Robot extends TitanBot {
     RelativeEncoder leftEncoderPrimary = leftControllerPrimary.getEncoder();
     RelativeEncoder rightEncoderPrimary = rightControllerPrimary.getEncoder();
 
+    final I2C.Port i2cPort = I2C.Port.kOnboard;
+    final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+
     
 
     this.drive = new RawDriveImpl(leftControllerPrimary, rightControllerPrimary, leftEncoderPrimary, rightEncoderPrimary);
@@ -149,7 +151,7 @@ public class Robot extends TitanBot {
     // ELEVATOR COMPONENTS
     WPI_TalonSRX elevatorMotorController = new WPI_TalonSRX(RobotMap.ELEVATOR_TALON_PORT);
     Ultrasonic elevatorSensor = new Ultrasonic(RobotMap.ELEVATOR_ULTRASONIC_PORTS[0], RobotMap.ELEVATOR_ULTRASONIC_PORTS[1]);
-    this.elevator = new ElevatorImpl(elevatorMotorController, elevatorSensor, shooter);
+    this.elevator = new ElevatorImpl(elevatorMotorController, elevatorSensor, shooter, m_colorSensor);
 
     this.ballSubsystem = new BallPathImpl(intake, elevator, shooter);
 
@@ -179,7 +181,6 @@ public class Robot extends TitanBot {
    */
   @Override
   public void robotPeriodic() {
-    // System.out.println("Robot periodic run");
 
   }
 
@@ -308,16 +309,14 @@ public class Robot extends TitanBot {
 
 
   }
-  TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
-  TalonFX shooterMotor = new TalonFX(RobotMap.SHOOTER_PORT);
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
       double forward, turn;
 
 
-      forward = -this.operatorPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS);
-      turn = this.operatorPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS);
+      forward = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS);
+      turn = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS);
 
       
       this.drive.drive(forward, turn);
@@ -341,10 +340,6 @@ public class Robot extends TitanBot {
               break;
       }
       
-      turretEncoderReadingPosition = this.turretMotor.getSelectedSensorPosition();
-      turretEncoderReadingVelocity = this.turretMotor.getSelectedSensorVelocity();
-      SmartDashboard.putNumber("velocity ", turretEncoderReadingVelocity);
-      SmartDashboard.putNumber("position ", turretEncoderReadingPosition);
       }
 
   static DpadDirection angleToDpadDirection(int angle) {
