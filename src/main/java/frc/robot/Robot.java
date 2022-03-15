@@ -261,10 +261,10 @@ public class Robot extends TitanBot {
     // this.driverPad.bind(ControllerBindings.CLIMBER_ROTATE, PressType.PRESS, () -> this.climberSubsystem.angleOuter(0.0));
     // this.driverPad.bind(ControllerBindings.CLIMBER_EXTEND, PressType.PRESS, () -> this.ballSubsystem.);
 
-    this.operatorPad.bind(ControllerBindings.INTAKE_START, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.INDEX));
-    this.operatorPad.bind(ControllerBindings.INTAKE_START, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
-    this.operatorPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.PRESS, () -> this.intake.setAction(IntakeAction.OUT));
-    this.operatorPad.bind(ControllerBindings.INTAKE_REVERSE, PressType.RELEASE, () -> this.intake.setAction(IntakeAction.NONE));
+    this.operatorPad.bind(ControllerBindings.INTAKE, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.INDEX));
+    this.operatorPad.bind(ControllerBindings.INTAKE, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
+    this.operatorPad.bind(ControllerBindings.OUTTAKE, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.OUT));
+    this.operatorPad.bind(ControllerBindings.OUTTAKE, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
 
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
     this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
@@ -310,7 +310,6 @@ public class Robot extends TitanBot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopRoutine() {
-    System.out.println("teleop routine");
       double forward, turn;
 
       // if(reverseDrive){
@@ -324,17 +323,24 @@ public class Robot extends TitanBot {
       this.drive.drive(forward, turn);
 
       DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
+      boolean lastDpad = false; 
       switch (dpadDirection) {
           case UP:
               this.elevator.setAction(ElevatorAction.IN);
+              lastDpad = true;
               break;
           case DOWN:
               this.elevator.setAction(ElevatorAction.OUT);
+              lastDpad = true;
               break;
           default:
-              this.elevator.setAction(ElevatorAction.NONE);
+              if (lastDpad){
+                this.elevator.setAction(ElevatorAction.NONE);
+                lastDpad = false;
+              }
               break;
       }
+      
       turretEncoderReadingPosition = this.turretMotor.getSelectedSensorPosition();
       turretEncoderReadingVelocity = this.turretMotor.getSelectedSensorVelocity();
       SmartDashboard.putNumber("velocity ", turretEncoderReadingVelocity);

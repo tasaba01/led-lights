@@ -20,6 +20,7 @@ public interface BallPath extends Subsystem, LifecycleListener {
         TEST,
         MANUAL,
         INDEX,
+        OUT,
         ;
     }
 }

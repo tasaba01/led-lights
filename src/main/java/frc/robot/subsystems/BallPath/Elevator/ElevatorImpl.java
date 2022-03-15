@@ -18,7 +18,7 @@ import frc.robot.subsystems.BallPath.Shooter.Shooter;
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
     private static final double MOTOR_SPEED = 0.8;
-    private static final double INDEX_MOTOR_SPEED = 0.35;
+    private static final double INDEX_MOTOR_SPEED = 0.30;
     private static final double PRIMED_DIST_THRESHOLD = 2;
     private static final int SAMPLE_COUNT = 1;
 
@@ -72,20 +72,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
         // for (Double d : sensorSamples) {
         //     meanReading += d / sensorSamples.size();
         // }
-        Color detectedColor = elevatorColorSensor.getColor();
-        SmartDashboard.putNumber("Red", detectedColor.red);
-        SmartDashboard.putNumber("Green", detectedColor.green);
-        SmartDashboard.putNumber("Blue", detectedColor.blue);
-        // boolean stateChanged = ballPresent != lastPresent;
-        if(detectedColor.red > 0.33){
-            detectedColorElevator = 1;
-            System.out.println("RED");
-        }else if(detectedColor.blue > 0.32){
-            detectedColorElevator = 2;
-            System.out.println("BLUE");
-        }else{
-            detectedColorElevator = 0;
-        }
+        
 
         switch (this.action) {
             case STOP:
@@ -108,18 +95,6 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                     this.elevator.stopMotor();
                 }
                 break;
-            case REJECT:
-                if (ballPresent) {
-                    this.elevator.set(-MOTOR_SPEED);
-                } else {
-                    this.elevator.stopMotor();
-                }
-                break;
-            case TEST:
-                if (shooter.readyToShoot()) {
-                    this.elevator.set(MOTOR_SPEED);
-                }
-                break;
             case IN:
                 if (!shooter.blocking()) {
                     this.elevator.set(MOTOR_SPEED);
@@ -132,14 +107,28 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 this.elevator.set(MOTOR_SPEED);
                 break;
             case INDEX:
-                System.out.println("INDEX IS WORKING FOR THE ELEVATOR");
+                Color detectedColor = elevatorColorSensor.getColor();
+                SmartDashboard.putNumber("Red", detectedColor.red);
+                SmartDashboard.putNumber("Green", detectedColor.green);
+                SmartDashboard.putNumber("Blue", detectedColor.blue);
+                System.out.println("Elevator Indexing");
+                // boolean stateChanged = ballPresent != lastPresent;
+                if(detectedColor.red > 0.33){
+                    detectedColorElevator = 1;
+                    System.out.println("RED");
+                }else if(detectedColor.blue > 0.32){
+                    detectedColorElevator = 2;
+                    System.out.println("BLUE");
+                }else{
+                    detectedColorElevator = 0;
+                }
                 if (detectedColorElevator == 1 || detectedColorElevator == 2){
                     this.elevator.set(0);
-                    System.out.println("Indexing the turret");
+                    System.out.println("BALL FOUND " + (detectedColorElevator == 1 ? "RED" : "BLUE"));
                     break;
                 }else{
+                    System.out.println("RUNNING ELEVATOR");
                     this.elevator.set(INDEX_MOTOR_SPEED);
-                    System.out.println("Indexing the turret");
                     break;
                 }
 

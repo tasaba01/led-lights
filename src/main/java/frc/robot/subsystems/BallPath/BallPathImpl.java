@@ -43,72 +43,69 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
         boolean intakeLoaded = this.intake.ballPrimed();
         boolean elevatorLoaded = this.elevator.ballPrimed();
 
-        boolean robotEmpty = !intakeLoaded && !elevatorLoaded;
-        boolean elevatorOnly = elevatorLoaded && !intakeLoaded;
-        boolean intakeOnly = intakeLoaded && !elevatorLoaded;
-        boolean full = intakeLoaded && elevatorLoaded;
+        // boolean robotEmpty = !intakeLoaded && !elevatorLoaded;
+        // boolean elevatorOnly = elevatorLoaded && !intakeLoaded;
+        // boolean intakeOnly = intakeLoaded && !elevatorLoaded;
+        // boolean full = intakeLoaded && elevatorLoaded;
 
         switch (action) {
-            case FEED:
-                if (robotEmpty) {
-                    intake.setAction(IntakeAction.FEED);
-                    elevator.setAction(ElevatorAction.FEED);
-                    shooter.setShotPosition(ShotPosition.NONE);
-                }
-                if (elevatorOnly) {
-                    elevator.setAction(ElevatorAction.NONE);
-                    intake.setAction(IntakeAction.FEED);
-                    shooter.setShotPosition(ShotPosition.NONE);
-                }
-                if (intakeOnly) {
-                    elevator.setAction(ElevatorAction.FEED);
-                    intake.setAction(IntakeAction.PRIME);
-                    shooter.setShotPosition(ShotPosition.NONE);
-                }
-                if (full) {
-                    elevator.setAction(ElevatorAction.NONE);
-                    intake.setAction(IntakeAction.NONE);
-                    shooter.setShotPosition(ShotPosition.NONE);
-                }
-                break;
-            case SHOOT:
-                if (robotEmpty) {
-                    elevator.setAction(ElevatorAction.FEED);
-                    intake.setAction(IntakeAction.NONE);
-                    shooter.setShotPosition(ShotPosition.NONE);
-                }
-                if (elevatorOnly) {
-                    if (shooter.readyToShoot()) {
-                        elevator.setAction(ElevatorAction.PRIME);
-                    }
-                    intake.setAction(IntakeAction.NONE);
-                }
-                if (intakeOnly) {
-                    elevator.setAction(ElevatorAction.PRIME);
-                    intake.setAction(IntakeAction.PRIME);
-                }
-                if (full) {
-                    if(shooter.readyToShoot()){
-                        elevator.setAction(ElevatorAction.PRIME);
-                        intake.setAction(IntakeAction.PRIME);
-                    }
-                }
-                break;
-            case TEST:
-                this.intake.setAction(IntakeAction.TEST);
-                this.elevator.setAction(ElevatorAction.TEST);
-                this.shooter.setShotPosition(ShotPosition.TEST);
-                break;
+            // case FEED:
+            //     if (robotEmpty) {
+            //         intake.setAction(IntakeAction.FEED);
+            //         elevator.setAction(ElevatorAction.FEED);
+            //         shooter.setShotPosition(ShotPosition.NONE);
+            //     }
+            //     if (elevatorOnly) {
+            //         elevator.setAction(ElevatorAction.NONE);
+            //         intake.setAction(IntakeAction.FEED);
+            //         shooter.setShotPosition(ShotPosition.NONE);
+            //     }
+            //     if (intakeOnly) {
+            //         elevator.setAction(ElevatorAction.FEED);
+            //         intake.setAction(IntakeAction.PRIME);
+            //         shooter.setShotPosition(ShotPosition.NONE);
+            //     }
+            //     if (full) {
+            //         elevator.setAction(ElevatorAction.NONE);
+            //         intake.setAction(IntakeAction.NONE);
+            //         shooter.setShotPosition(ShotPosition.NONE);
+            //     }
+            //     break;
+            // case SHOOT:
+            //     if (robotEmpty) {
+            //         elevator.setAction(ElevatorAction.FEED);
+            //         intake.setAction(IntakeAction.NONE);
+            //         shooter.setShotPosition(ShotPosition.NONE);
+            //     }
+            //     if (elevatorOnly) {
+            //         if (shooter.readyToShoot()) {
+            //             elevator.setAction(ElevatorAction.PRIME);
+            //         }
+            //         intake.setAction(IntakeAction.NONE);
+            //     }
+            //     if (intakeOnly) {
+            //         elevator.setAction(ElevatorAction.PRIME);
+            //         intake.setAction(IntakeAction.PRIME);
+            //     }
+            //     if (full) {
+            //         if(shooter.readyToShoot()){
+            //             elevator.setAction(ElevatorAction.PRIME);
+            //             intake.setAction(IntakeAction.PRIME);
+            //         }
+            //     }
+            //     break;
             case NONE:
                 this.intake.setAction(IntakeAction.STOP);
                 this.elevator.setAction(ElevatorAction.STOP);
                 // this.shooter.setShotPosition(ShotPosition.NONE);
-                System.out.println("SETTING TO NONE");
                 break;
             case INDEX:
                 this.elevator.setAction(ElevatorAction.INDEX);
                 this.intake.setAction(IntakeAction.IN);
-                System.out.println("Indexing");
+                break;
+            case OUT:
+                this.elevator.setAction(ElevatorAction.OUT);
+                this.intake.setAction(IntakeAction.OUT);
                 break;
             case AUTO:
             case MANUAL:
