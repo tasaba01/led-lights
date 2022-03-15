@@ -315,8 +315,8 @@ public class Robot extends TitanBot {
       double forward, turn;
 
 
-      forward = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.Y_AXIS);
-      turn = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.X_AXIS);
+      forward = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
+      turn = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
 
       
       this.drive.drive(forward, turn);

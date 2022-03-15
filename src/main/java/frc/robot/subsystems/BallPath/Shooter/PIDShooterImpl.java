@@ -106,7 +106,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         // Integer FarLaunchPad = 330_000; // pls test
         // Integer HumanPlayer = 400_000; // pls test
         double[] distances = {55.0, 153.0, 202.95, 244.77, 305.66};
-        Integer[] hoodValues = {100_000, 230_000, 300_000, 330_000, 400_000};
+        int[] hoodValues = {100_000, 230_000, 300_000, 330_000, 400_000};
 
         // LinkedHashMap<Double, Integer> foundValues = new LinkedHashMap<>();
         // foundValues.put(55.0, Fender);
@@ -114,9 +114,9 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         // foundValues.put(202.95, CloseLaunchPad);
         // foundValues.put(244.77, FarLaunchPad);
         // foundValues.put(305.66, HumanPlayer);
-        for (int i = 0; i < distances.length; i++) {
+        for (int i = 1; i < distances.length; i++) {
             double key = distances[i];
-            if(distance < key && i != 0){
+            if(distance < key){
                 distDif = distances[i] - distances[i-1];
                 hoodDif = hoodValues[i] - hoodValues[i-1];
                 difFromUpper = distances[i] - distance;
@@ -125,7 +125,6 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 returnAmount = amountToAdd + hoodValues[i-1];
                 break;
             }
-            i+=1;
         }
         return returnAmount;
     }
@@ -145,11 +144,11 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         // foundValues.put(244.77, FarLaunchPad);
         // foundValues.put(305.66, HumanPlayer);
         double[] distances = {55.0, 153.0, 202.95, 244.77, 305.66};
-        Integer[] wheelValues = {3_500, 5_400, 7_000, 8_000, 10_000};
+        int[] wheelValues = {3_500, 5_400, 7_000, 8_000, 10_000};
     
-        for (int i = 0; i < distances.length; i++) {
+        for (int i = 1; i < distances.length; i++) {
             double key = distances[i];
-            if(distance < key && i != 0){
+            if(distance < key){
                 distDif = distances[i] - distances[i-1];
                 wheelDif = wheelValues[i] - wheelValues[i-1];
                 difFromUpper = distances[i] - distance;
@@ -158,7 +157,6 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 returnAmount = amountToAdd + wheelValues[i-1];
                 break;
             }
-            i+=1;
         }
         return returnAmount;
     }
