@@ -113,7 +113,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
             case NONE:
                 this.intake.setAction(IntakeAction.STOP);
                 this.elevator.setAction(ElevatorAction.STOP);
-                // this.shooter.setShotPosition(ShotPosition.NONE);
+                this.shooter.setShotPosition(ShotPosition.NONE);
                 break;
             case INDEX:
                 this.elevator.setAction(ElevatorAction.INDEX);
@@ -126,6 +126,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
             case AUTO:
             case MANUAL:
                 break;
+            
             default:
                 intake.setAction(IntakeAction.NONE);
                 elevator.setAction(ElevatorAction.NONE);

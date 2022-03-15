@@ -36,7 +36,7 @@ public class RawShooterImpl extends RepeatingPooledSubsystem implements Shooter 
     private final double hoodBuffer = 18_000;
     private final double turretBuffer = 30000;
     private final double turretSpeed = 0.15;
-    private final double hoodSpeed = 1;
+    private final double hoodSpeed = .75;
 
     public RawShooterImpl(TalonSRX turretMotor, TalonFX shooterMotor, TalonSRX hoodMotor) {
         super(10, TimeUnit.MILLISECONDS);
@@ -169,7 +169,11 @@ public class RawShooterImpl extends RepeatingPooledSubsystem implements Shooter 
 
     @Override
     public boolean readyToShoot(){
-        return turretReady && hoodReady && shooterEncoderReadingVelocity > 5000;
+        boolean shooterReady = false;
+        if(Math.abs(shooterEncoderReadingVelocity) > setPointShooter - 500 && Math.abs(shooterEncoderReadingVelocity) < shooterEncoderReadingVelocity + 500){
+            shooterReady = true;
+        }
+        return turretReady && hoodReady && shooterReady;
     }
 
     @Override

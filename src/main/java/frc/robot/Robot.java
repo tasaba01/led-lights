@@ -266,11 +266,11 @@ public class Robot extends TitanBot {
     this.operatorPad.bind(ControllerBindings.OUTTAKE, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.OUT));
     this.operatorPad.bind(ControllerBindings.OUTTAKE, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.FENDER));
-    this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+    this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.SHOOTFENDER));
+    this.operatorPad.bind(ControllerBindings.SHOOT_FENDER, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
 
-    this.operatorPad.bind(ControllerBindings.SHOOT_GENERAL, PressType.PRESS, () -> this.shooter.setShotPosition(ShotPosition.GENERAL));
-    this.operatorPad.bind(ControllerBindings.SHOOT_GENERAL, PressType.RELEASE, () -> this.shooter.setShotPosition(ShotPosition.NONE));
+    this.operatorPad.bind(ControllerBindings.SHOOT_GENERAL, PressType.PRESS, () -> this.ballSubsystem.setAction(BallAction.SHOOTGENERAL));
+    this.operatorPad.bind(ControllerBindings.SHOOT_GENERAL, PressType.RELEASE, () -> this.ballSubsystem.setAction(BallAction.NONE));
 
     // this.operatorPad.bind(ControllerBindings.DRIVE_REVERSE, PressType.PRESS, () -> reverseDrive = true);
     // this.operatorPad.bind(ControllerBindings.DRIVE_REVERSE, PressType.RELEASE, () -> reverseDrive = false);
