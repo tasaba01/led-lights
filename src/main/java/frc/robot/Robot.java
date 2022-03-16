@@ -310,8 +310,13 @@ public class Robot extends TitanBot {
 
   }
   /** This function is called periodically during operator control. */
+  TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
   @Override
   public void teleopRoutine() {
+      double position = this.turretMotor.getSelectedSensorPosition();
+      SmartDashboard.putNumber("position", position);
+
+
       double forward, turn;
 
 
@@ -320,19 +325,6 @@ public class Robot extends TitanBot {
 
       
       this.drive.drive(forward, turn);
-
-      DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
-      switch (dpadDirection) {
-          case UP:
-              this.elevator.setAction(ElevatorAction.IN);
-              break;
-          case DOWN:
-              this.elevator.setAction(ElevatorAction.OUT);
-              break;
-          default:
-              this.elevator.setAction(ElevatorAction.NONE);
-              break;
-      }
       
       }
 

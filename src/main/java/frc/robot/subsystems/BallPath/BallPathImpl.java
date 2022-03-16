@@ -97,7 +97,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
             case SHOOTGENERAL:
                 this.shooter.setShotPosition(ShotPosition.GENERAL);
                 if(shooter.readyToShoot()){
-                    elevator.setAction(ElevatorAction.PRIME);
+                    elevator.setAction(ElevatorAction.RUN);
                 }else{
                     elevator.setAction(ElevatorAction.NONE);
                 }
@@ -106,8 +106,10 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 this.shooter.setShotPosition(ShotPosition.FENDER);
                 if(shooter.readyToShoot()){
                     elevator.setAction(ElevatorAction.PRIME);
+                    // System.out.println("Running the elevator");
                 }else{
                     elevator.setAction(ElevatorAction.NONE);
+                    System.out.println("Not running the elevator");
                 }
                 break;
             case NONE:

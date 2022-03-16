@@ -296,7 +296,11 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
 
     @Override
     public boolean readyToShoot(){
-        return turretReady && hoodReady && shooterPid.atSetpoint();
+        boolean shooterReady = false;
+        if(Math.abs(shooterEncoderReadingVelocity) > setPointShooterPID - 500 && Math.abs(shooterEncoderReadingVelocity) < shooterEncoderReadingVelocity + 500){
+            shooterReady = true;
+        }
+        return turretReady && hoodReady && shooterReady;
     }
 
     @Override

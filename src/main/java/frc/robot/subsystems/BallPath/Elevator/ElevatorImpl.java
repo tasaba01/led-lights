@@ -61,6 +61,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
     @Override
     public void task() throws Exception {
+        Color detectedColor;
 
         // double sensorReading = this.sensor.getRangeInches();
         // // SmartDashboard.putNumber("Elevator Ultrasonic", sensorReading);
@@ -89,10 +90,35 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 }
                 break;
             case PRIME:
+                // checking for ball
+                detectedColor = elevatorColorSensor.getColor();
+                SmartDashboard.putNumber("Red", detectedColor.red);
+                SmartDashboard.putNumber("Green", detectedColor.green);
+                SmartDashboard.putNumber("Blue", detectedColor.blue);
+                if(detectedColor.red > 0.33){
+                    detectedColorElevator = 1;
+                    // System.out.println("RED");
+                }else if(detectedColor.blue > 0.32){
+                    detectedColorElevator = 2;
+                    // System.out.println("BLUE");
+                }else{
+                    detectedColorElevator = 0;
+                }
+
+                if (detectedColorElevator == 1 || detectedColorElevator == 2){
+                    ballPresent = true;
+                    System.out.println("Ball present is true");
+                }else{
+                    System.out.println(" Ball present is false");
+                    ballPresent = false;
+                }
+                // actual code
                 if (ballPresent) {
+                    System.out.println("SETTING MOTOR SPEED");
                     this.elevator.set(MOTOR_SPEED);
                 } else {
-                    this.elevator.stopMotor();
+                    System.out.println("NOT SETTING MOTOR SPEED");
+                    this.elevator.set(0);
                 }
                 break;
             case IN:
@@ -107,7 +133,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 this.elevator.set(MOTOR_SPEED);
                 break;
             case INDEX:
-                Color detectedColor = elevatorColorSensor.getColor();
+                detectedColor = elevatorColorSensor.getColor();
                 SmartDashboard.putNumber("Red", detectedColor.red);
                 SmartDashboard.putNumber("Green", detectedColor.green);
                 SmartDashboard.putNumber("Blue", detectedColor.blue);
@@ -115,19 +141,19 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 // boolean stateChanged = ballPresent != lastPresent;
                 if(detectedColor.red > 0.33){
                     detectedColorElevator = 1;
-                    System.out.println("RED");
+                    // System.out.println("RED");
                 }else if(detectedColor.blue > 0.32){
                     detectedColorElevator = 2;
-                    System.out.println("BLUE");
+                    // System.out.println("BLUE");
                 }else{
                     detectedColorElevator = 0;
                 }
                 if (detectedColorElevator == 1 || detectedColorElevator == 2){
                     this.elevator.set(0);
-                    System.out.println("BALL FOUND " + (detectedColorElevator == 1 ? "RED" : "BLUE"));
+                    // System.out.println("BALL FOUND " + (detectedColorElevator == 1 ? "RED" : "BLUE"));
                     break;
                 }else{
-                    System.out.println("RUNNING ELEVATOR");
+                    // System.out.println("RUNNING ELEVATOR");
                     this.elevator.set(INDEX_MOTOR_SPEED);
                     break;
                 }
