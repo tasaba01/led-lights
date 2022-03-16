@@ -322,21 +322,15 @@ public class Robot extends TitanBot {
       this.drive.drive(forward, turn);
 
       DpadDirection dpadDirection = angleToDpadDirection(this.operatorPad.getDpad());
-      boolean lastDpad = false; 
       switch (dpadDirection) {
           case UP:
               this.elevator.setAction(ElevatorAction.IN);
-              lastDpad = true;
               break;
           case DOWN:
               this.elevator.setAction(ElevatorAction.OUT);
-              lastDpad = true;
               break;
           default:
-              if (lastDpad){
-                this.elevator.setAction(ElevatorAction.NONE);
-                lastDpad = false;
-              }
+              this.elevator.setAction(ElevatorAction.NONE);
               break;
       }
       
