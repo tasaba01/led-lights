@@ -197,7 +197,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 totalAngleRadians = Math.toRadians(totalAngle);
                 rs = Math.tan(totalAngleRadians);
                 totalDistance = heightDif / rs;
-                System.out.println(totalDistance);
+                // System.out.println(totalDistance);
                 setPointHood = getSetpointHood(totalDistance);
                 setPointShooterPID = getSetpointWheel(totalDistance);
                 break;

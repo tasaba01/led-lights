@@ -45,6 +45,9 @@ import frc.robot.subsystems.BallPath.Shooter.RawShooterImpl;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Drivetrain.Drive;
 import frc.robot.subsystems.Drivetrain.RawDriveImpl;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -73,6 +76,7 @@ public class Robot extends TitanBot {
   double turretEncoderReadingVelocity;
 
   private Autonomous auto;
+  AHRS ahrs;
   // private RelativeEncoder leftEncoder1, leftEncoder2, rightEncoder1, rightEncoder2;
 
 
@@ -161,6 +165,9 @@ public class Robot extends TitanBot {
 
     //this.climberSubsystem = new ClimberImpl();
 
+    
+    ahrs = new AHRS(SPI.Port.kMXP); 
+
     // register lifecycle components
     registerLifecycleComponent(driverPad);
     registerLifecycleComponent(operatorPad);
@@ -181,7 +188,8 @@ public class Robot extends TitanBot {
    */
   @Override
   public void robotPeriodic() {
-
+    SmartDashboard.putNumber(   "IMU_TotalYaw",         ahrs.getAngle());
+    SmartDashboard.putNumber(   "IMU_YawRateDPS",       ahrs.getRate());
   }
 
   /**

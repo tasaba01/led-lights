@@ -170,7 +170,7 @@ public class RawShooterImpl extends RepeatingPooledSubsystem implements Shooter 
     @Override
     public boolean readyToShoot(){
         boolean shooterReady = false;
-        if(Math.abs(shooterEncoderReadingVelocity) > setPointShooter - 500 && Math.abs(shooterEncoderReadingVelocity) < shooterEncoderReadingVelocity + 500){
+        if(Math.abs(shooterEncoderReadingVelocity) > setPointShooter - 300 && Math.abs(shooterEncoderReadingVelocity) < shooterEncoderReadingVelocity + 300){
             shooterReady = true;
         }
         return turretReady && hoodReady && shooterReady;
