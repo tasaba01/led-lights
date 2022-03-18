@@ -17,7 +17,7 @@ import frc.robot.subsystems.BallPath.Shooter.Shooter;
 
 public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
-    private static final double MOTOR_SPEED = 0.85;
+    private static final double MOTOR_SPEED = 0.65;
     private static final double INDEX_MOTOR_SPEED = 0.25; // 0.35
     private static final double PRIMED_DIST_THRESHOLD = 2;
     private static final int SAMPLE_COUNT = 1;
@@ -35,7 +35,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     long count = 0;
 
     public ElevatorImpl(WPI_TalonSRX elevator, Ultrasonic sensor, Shooter shooter, ColorSensorV3 elevatorColorSensor) {
-        super(50, TimeUnit.MILLISECONDS);
+        super(20, TimeUnit.MILLISECONDS);
         this.elevatorColorSensor = elevatorColorSensor;
         this.elevator = elevator;
         this.sensor = sensor;
@@ -57,6 +57,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
 
     @Override
     public boolean ballPrimed() {
+        System.out.println(ballPresent);
         return ballPresent;
     }
 
@@ -84,14 +85,14 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 this.elevator.set(MOTOR_SPEED);
                 ballPresent = false;
                 break;
-            case FEED:
-                if (ballPresent) {
-                    this.elevator.stopMotor();
-                } else {
-                    this.elevator.set(MOTOR_SPEED);
-                    ballPresent = false;
-                }
-                break;
+            // case FEED:
+            //     if (ballPresent) {
+            //         this.elevator.stopMotor();
+            //     } else {
+            //         this.elevator.set(MOTOR_SPEED);
+            //         ballPresent = false;
+            //     }
+            //     break;
             case PRIME:
                 // checking for ball
                 detectedColor = elevatorColorSensor.getColor();

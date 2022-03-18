@@ -186,7 +186,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         switch (this.requestedPosition) {
             case FENDER:
                 setPointHood = 100_000;
-                setPointShooterPID = 5500; 
+                setPointShooterPID = 3000; 
                 setPointRotation = 0;
                 centerUsingLimelight = false;
                 break;
@@ -210,8 +210,10 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 // System.out.println("height sif" + heightDif);
                 // System.out.println("rs" + rs);
                 // System.out.println(totalDistance);
-                setPointHood = getSetpointHood(totalDistance);
+                // setPointHood = getSetpointHood(totalDistance);
+                setPointHood = 0;
                 setPointShooterPID = getSetpointWheel(totalDistance);
+                setPointShooterPID = 0;
                 // System.out.println(setPointShooterPID);
                 break;
             case NONE:
@@ -315,7 +317,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         if(Math.abs(shooterEncoderReadingVelocity) > setPointShooterPID - 500 && Math.abs(shooterEncoderReadingVelocity) < shooterEncoderReadingVelocity + 500){
             shooterReady = true;
         }
-        return turretReady && hoodReady && shooterReady;
+        return turretReady && shooterReady;
     }
 
     @Override

@@ -19,6 +19,8 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
     private volatile BallAction action = BallAction.NONE;
 
+    boolean waited = false;
+
     public BallPathImpl(Intake intake, Elevator elevator, Shooter shooter) {
         super(20, TimeUnit.MILLISECONDS);
         this.intake = intake;
@@ -100,14 +102,12 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 if(shooter.readyToShoot()){
                     // System.out.println("Primed: " + elevator.ballPrimed());
                     if (!elevator.ballPrimed()){
-                        
                         // System.out.println("BallPath: Not primed, Indexing the elevator");
                         elevator.setAction(ElevatorAction.INDEX);
                     }
                     else{
                         // System.out.println("BallPath: Priming");
                         elevator.setAction(ElevatorAction.PRIME);
-
                     }
                     // System.out.println("Running the elevator");
                 }else{
@@ -116,20 +116,16 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 }
                 break;
             case SHOOTFENDER:
-                int i = 0;
-                this.shooter.setShotPosition(ShotPosition.TEST);
+                this.shooter.setShotPosition(ShotPosition.FENDER);
                 // System.out.println("BallPath: Shooting");
                 if(shooter.readyToShoot()){
                     // System.out.println("Primed: " + elevator.ballPrimed());
                     if (!elevator.ballPrimed()){
-                        
                         // System.out.println("BallPath: Not primed, Indexing the elevator");
                         elevator.setAction(ElevatorAction.INDEX);
-                    }
-                    else{
+                    }else{
                         // System.out.println("BallPath: Priming");
                         elevator.setAction(ElevatorAction.PRIME);
-
                     }
                     // System.out.println("Running the elevator");
                 }else{
@@ -141,6 +137,7 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 this.intake.setAction(IntakeAction.STOP);
                 this.elevator.setAction(ElevatorAction.STOP);
                 this.shooter.setShotPosition(ShotPosition.NONE);
+                waited = false;
                 break;
             case INDEX:
                 this.elevator.setAction(ElevatorAction.INDEX);

@@ -130,7 +130,7 @@ public class Robot extends TitanBot {
     RelativeEncoder leftEncoderPrimary = leftControllerPrimary.getEncoder();
     RelativeEncoder rightEncoderPrimary = rightControllerPrimary.getEncoder();
 
-    final I2C.Port i2cPort = I2C.Port.kOnboard;
+    final I2C.Port i2cPort = I2C.Port.kMXP;
     final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
 
     
@@ -190,6 +190,9 @@ public class Robot extends TitanBot {
   public void robotPeriodic() {
     SmartDashboard.putNumber(   "IMU_TotalYaw",         ahrs.getAngle());
     SmartDashboard.putNumber(   "IMU_YawRateDPS",       ahrs.getRate());
+    double position = this.turretMotor.getSelectedSensorPosition();
+    SmartDashboard.putNumber("position", position);
+    
   }
 
   /**
