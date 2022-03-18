@@ -247,7 +247,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
             hoodMotor.set(ControlMode.PercentOutput, -hoodSpeed);
             hoodReady = false;
         }
-        hoodReady = true;
+        
 
         if(!centerUsingLimelight){
             if (setPointRotation == Double.NEGATIVE_INFINITY) {
