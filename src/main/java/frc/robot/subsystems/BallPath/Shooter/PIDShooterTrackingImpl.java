@@ -84,10 +84,7 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
     double h1 = 35; // HEIGHT OF LIMELIGHT
 
     double heightDif = h2 - h1;
-    
-    
-
-    
+ 
 
     public PIDShooterTrackingImpl(TalonSRX turretMotor, TalonFX shooterMotor, TalonSRX hoodMotor) {
         super(10, TimeUnit.MILLISECONDS);
@@ -214,6 +211,7 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
         }
 
         // turret movement
+        // if the user does not want to do a fender shot
         if(aim){
             // only get the distance if we are aiming
             tx = table.getEntry("tx");
@@ -231,6 +229,7 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
             
             if(turretEncoderReadingPosition > leftLimit && turretEncoderReadingPosition < rightLimit && !flipLeft && !flipRight){
                 if(canSeeTarget==1.0){
+                    // if we are in the encoder limits, can see the target, and do not want to "flip"
                     if(x < 1 && x > -1){
                         turretMotor.set(ControlMode.PercentOutput, 0);
                         turretReady = true;
@@ -242,6 +241,7 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
                         turretReady = false;
                     }
                 }else{
+                    // if we cannot see the target, flip to one of the limits
                     if(turretEncoderReadingPosition >= 0){
                         flipLeft = true;
                         turretReady = false;
@@ -250,6 +250,7 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
                         turretReady = false;
                     }
                 }
+            // if we are past the left limit, flip to the right
             }else if(turretEncoderReadingPosition < leftLimit || flipRight == true){
                 flipRight = true;
                 turretReady = false;
@@ -258,6 +259,7 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
                 }else{
                     flipRight = false;
                 }
+            // if we are at the right limit, flip to the left
             }else if(turretEncoderReadingPosition > rightLimit || flipLeft == true){
                 turretReady = false;
                 flipLeft = true;
@@ -267,6 +269,8 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
                     flipLeft = false;
                 }
             }    
+        // if we want to shoot the fender shot, set the turret position to be 0 (straight)
+        // this may change if we have a turret that can turn 180 degrees
         }else{
             if(turretHoodPosition >= setPointHood - hoodBuffer && turretHoodPosition <= setPointHood + hoodBuffer){
                 hoodMotor.set(ControlMode.PercentOutput, 0);
