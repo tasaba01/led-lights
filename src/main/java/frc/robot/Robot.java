@@ -188,11 +188,6 @@ public class Robot extends TitanBot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber(   "IMU_TotalYaw",         ahrs.getAngle());
-    SmartDashboard.putNumber(   "IMU_YawRateDPS",       ahrs.getRate());
-    double position = this.turretMotor.getSelectedSensorPosition();
-    SmartDashboard.putNumber("position", position);
-    
   }
 
   /**
@@ -324,19 +319,11 @@ public class Robot extends TitanBot {
   TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
   @Override
   public void teleopRoutine() {
-      double position = this.turretMotor.getSelectedSensorPosition();
-      SmartDashboard.putNumber("position", position);
-
-
       double forward, turn;
-
-
       forward = this.driverPad.getValue(ControllerBindings.RIGHT_STICK, ControllerBindings.Y_AXIS);
       turn = this.driverPad.getValue(ControllerBindings.LEFT_STICK, ControllerBindings.X_AXIS);
 
-      
-      this.drive.drive(forward, turn);
-      
+      this.drive.drive(forward, turn); 
       }
 
   static DpadDirection angleToDpadDirection(int angle) {
