@@ -27,9 +27,9 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
     private final TalonFX shooterMotor;
     private final TalonSRX hoodMotor;
 
-    private double kp = 0.0023; // 0.00175
-    private double ki = 0.00002; // 0.00002
-    private double kd = 0.00002; // 0.00002
+    static final double kp = 0.0023; // 0.00175
+    static final double ki = 0.00002; // 0.00002
+    static final double kd = 0.00002; // 0.00002
 
     private volatile ShotPosition requestedPosition = ShotPosition.NONE;
     private double setPointHood;

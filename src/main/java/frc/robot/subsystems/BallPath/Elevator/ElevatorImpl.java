@@ -27,8 +27,6 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
     private final Shooter shooter;
 
     private volatile ElevatorAction action = ElevatorAction.NONE;
-    private boolean lastPresent = false;
-    private final Queue<Double> sensorSamples;
     private final ColorSensorV3 elevatorColorSensor;
     boolean ballPresent = false;
     int detectedColorElevator = 0;
@@ -40,7 +38,6 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
         this.elevator = elevator;
         this.sensor = sensor;
         this.shooter = shooter;
-        this.sensorSamples = new ArrayDeque<>();
     }
 
     @Override
@@ -113,9 +110,7 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 if (detectedColorElevator == 1 || detectedColorElevator == 2){
                     ballPresent = true;
                     this.elevator.set(MOTOR_SPEED);
-                    // System.out.println("Elevator: Ball present is true");
                 }else{
-                    // System.out.println("Elevator: Ball present is false\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                     ballPresent = false;
                     this.elevator.set(0);
                 }
@@ -136,32 +131,23 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 break;
             case INDEX:
                 count ++;
-                // System.out.println(count + " " + (count % 10));
                 if (!ballPresent || (count % 10) == 0){
                     detectedColor = elevatorColorSensor.getColor();
                     SmartDashboard.putNumber("Red", detectedColor.red);
                     SmartDashboard.putNumber("Green", detectedColor.green);
                     SmartDashboard.putNumber("Blue", detectedColor.blue);
-                    // System.out.println("Elevator: Elevator Indexing");
-                    // boolean stateChanged = ballPresent != lastPresent;
                     if(detectedColor.red > 0.31){
                         detectedColorElevator = 1;
-                        // System.out.println("Elevator: Red Ball");
-                        // System.out.println("RED");
                     }else if(detectedColor.blue > 0.31){
                         detectedColorElevator = 2;
-                        // System.out.println("Elevator: Blue Ball");
-                        // System.out.println("BLUE");
                     }else{
                         detectedColorElevator = 0;
                     }
                     if (detectedColorElevator == 1 || detectedColorElevator == 2){
                         this.elevator.set(0);
                         ballPresent = true;
-                        // System.out.println("BALL FOUND " + (detectedColorElevator == 1 ? "RED" : "BLUE"));
                         break;
                     }else{
-                        // System.out.println("RUNNING ELEVATOR");
                         this.elevator.set(INDEX_MOTOR_SPEED);
                         ballPresent = false;
                         break;
@@ -178,8 +164,6 @@ public class ElevatorImpl extends RepeatingPooledSubsystem implements Elevator {
                 elevator.stopMotor();
                 break;
         }
-
-        lastPresent = ballPresent;
     }
 
     @Override

@@ -277,7 +277,6 @@ public class Robot extends TitanBot {
 
   }
   /** This function is called periodically during operator control. */
-  TalonSRX turretMotor = new TalonSRX(RobotMap.TURRET_PORT);
   @Override
   public void teleopRoutine() {
       double forward, turn;

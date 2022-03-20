@@ -19,8 +19,6 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
     private volatile BallAction action = BallAction.NONE;
 
-    boolean waited = false;
-
     public BallPathImpl(Intake intake, Elevator elevator, Shooter shooter) {
         super(20, TimeUnit.MILLISECONDS);
         this.intake = intake;
@@ -72,7 +70,6 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
                 this.intake.setAction(IntakeAction.STOP);
                 this.elevator.setAction(ElevatorAction.STOP);
                 this.shooter.setShotPosition(ShotPosition.NONE);
-                waited = false;
                 break;
             case INDEX:
                 this.elevator.setAction(ElevatorAction.INDEX);
