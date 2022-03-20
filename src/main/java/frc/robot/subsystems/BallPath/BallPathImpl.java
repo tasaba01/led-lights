@@ -42,95 +42,30 @@ public class BallPathImpl extends RepeatingPooledSubsystem implements BallPath {
 
     @Override
     public void task() {
-        boolean intakeLoaded = this.intake.ballPrimed();
-        boolean elevatorLoaded = this.elevator.ballPrimed();
-
-        // boolean robotEmpty = !intakeLoaded && !elevatorLoaded;
-        // boolean elevatorOnly = elevatorLoaded && !intakeLoaded;
-        // boolean intakeOnly = intakeLoaded && !elevatorLoaded;
-        // boolean full = intakeLoaded && elevatorLoaded;
-
         switch (action) {
-            // case FEED:
-            //     if (robotEmpty) {
-            //         intake.setAction(IntakeAction.FEED);
-            //         elevator.setAction(ElevatorAction.FEED);
-            //         shooter.setShotPosition(ShotPosition.NONE);
-            //     }
-            //     if (elevatorOnly) {
-            //         elevator.setAction(ElevatorAction.NONE);
-            //         intake.setAction(IntakeAction.FEED);
-            //         shooter.setShotPosition(ShotPosition.NONE);
-            //     }
-            //     if (intakeOnly) {
-            //         elevator.setAction(ElevatorAction.FEED);
-            //         intake.setAction(IntakeAction.PRIME);
-            //         shooter.setShotPosition(ShotPosition.NONE);
-            //     }
-            //     if (full) {
-            //         elevator.setAction(ElevatorAction.NONE);
-            //         intake.setAction(IntakeAction.NONE);
-            //         shooter.setShotPosition(ShotPosition.NONE);
-            //     }
-            //     break;
-            // case SHOOT:
-            //     if (robotEmpty) {
-            //         elevator.setAction(ElevatorAction.FEED);
-            //         intake.setAction(IntakeAction.NONE);
-            //         shooter.setShotPosition(ShotPosition.NONE);
-            //     }
-            //     if (elevatorOnly) {
-            //         if (shooter.readyToShoot()) {
-            //             elevator.setAction(ElevatorAction.PRIME);
-            //         }
-            //         intake.setAction(IntakeAction.NONE);
-            //     }
-            //     if (intakeOnly) {
-            //         elevator.setAction(ElevatorAction.PRIME);
-            //         intake.setAction(IntakeAction.PRIME);
-            //     }
-            //     if (full) {
-            //         if(shooter.readyToShoot()){
-            //             elevator.setAction(ElevatorAction.PRIME);
-            //             intake.setAction(IntakeAction.PRIME);
-            //         }
-            //     }
-            //     break;
             case SHOOTGENERAL:
                 this.shooter.setShotPosition(ShotPosition.GENERAL);
-                // System.out.println("BallPath: Shooting");
                 if(shooter.readyToShoot()){
-                    // System.out.println("Primed: " + elevator.ballPrimed());
                     if (!elevator.ballPrimed()){
-                        // System.out.println("BallPath: Not primed, Indexing the elevator");
                         elevator.setAction(ElevatorAction.INDEX);
                     }
                     else{
-                        // System.out.println("BallPath: Priming");
                         elevator.setAction(ElevatorAction.PRIME);
                     }
-                    // System.out.println("Running the elevator");
                 }else{
                     elevator.setAction(ElevatorAction.INDEX);
-                    // System.out.println("BallPath: Shooter not ready, Indexing the elevator");
                 }
                 break;
             case SHOOTFENDER:
                 this.shooter.setShotPosition(ShotPosition.FENDER);
-                // System.out.println("BallPath: Shooting");
                 if(shooter.readyToShoot()){
-                    // System.out.println("Primed: " + elevator.ballPrimed());
                     if (!elevator.ballPrimed()){
-                        // System.out.println("BallPath: Not primed, Indexing the elevator");
                         elevator.setAction(ElevatorAction.INDEX);
                     }else{
-                        // System.out.println("BallPath: Priming");
                         elevator.setAction(ElevatorAction.PRIME);
                     }
-                    // System.out.println("Running the elevator");
                 }else{
                     elevator.setAction(ElevatorAction.INDEX);
-                    // System.out.println("BallPath: Shooter not ready, Indexing the elevator");
                 }
                 break;
             case NONE:

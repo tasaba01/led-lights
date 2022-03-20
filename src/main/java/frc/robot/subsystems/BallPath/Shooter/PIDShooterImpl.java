@@ -67,15 +67,9 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
 
     double a1 = 35; // angle of limelight
     double a2 = y;
-    // System.out.println(y);
     double h2 = 103; // HEIGHT OF TARGET
     double h1 = 35; // HEIGHT OF LIMELIGHT
-
     double heightDif = h2 - h1;
-    
-    
-
-    
 
     public PIDShooterImpl(TalonSRX turretMotor, TalonFX shooterMotor, TalonSRX hoodMotor) {
         super(10, TimeUnit.MILLISECONDS);
@@ -103,20 +97,9 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
     public double getSetpointHood(double distance){
         double hoodDif, distDif, difFromUpper, percentToAdd, amountToAdd;
         double returnAmount = 0;
-        // Integer Fender = 100_000;
-        // Integer Tarmac = 230_000;
-        // Integer CloseLaunchPad = 300_000; // pls test
-        // Integer FarLaunchPad = 330_000; // pls test
-        // Integer HumanPlayer = 400_000; // pls test
         double[] distances = {55.0, 153.0, 202.95, 244.77, 305.66};
         int[] hoodValues = {100_000, 230_000, 300_000, 330_000, 400_000};
 
-        // LinkedHashMap<Double, Integer> foundValues = new LinkedHashMap<>();
-        // foundValues.put(55.0, Fender);
-        // foundValues.put(153.0, Tarmac);
-        // foundValues.put(202.95, CloseLaunchPad);
-        // foundValues.put(244.77, FarLaunchPad);
-        // foundValues.put(305.66, HumanPlayer);
         for (int i = 1; i < distances.length; i++) {
             double key = distances[i];
             if(distance < key){
@@ -135,17 +118,6 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
     public double getSetpointWheel(Double distance){
         double wheelDif, distDif, difFromUpper, percentToAdd, amountToAdd, a;
         double returnAmount = 0;
-        // Integer Fender = 3_500;
-        // Integer Tarmac = 5_400;
-        // Integer CloseLaunchPad = 7_000; // pls test
-        // Integer FarLaunchPad = 8_000; // pls test
-        // Integer HumanPlayer = 10_000; // pls test
-        // HashMap<Double, Integer> foundValues = new HashMap<>();
-        // foundValues.put(55.0, Fender);
-        // foundValues.put(153.0, Tarmac);
-        // foundValues.put(202.95, CloseLaunchPad);
-        // foundValues.put(244.77, FarLaunchPad);
-        // foundValues.put(305.66, HumanPlayer);
         double[] distances = {44.0, 113.4, 145.5, 170.8, 220.5};
         int[] wheelValues = {5_500, 7_500, 9_500, 10_000, 11_000};
     
@@ -155,8 +127,6 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 distDif = distances[i] - distances[i-1];
                 wheelDif = wheelValues[i] - wheelValues[i-1];
                 difFromUpper = distances[i] - distance;
-
-                
                 percentToAdd = difFromUpper / distDif;
                 amountToAdd = percentToAdd * wheelDif;
                 returnAmount = wheelValues[i] - amountToAdd;
@@ -176,12 +146,12 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         turretEncoderReadingPosition = this.turretMotor.getSelectedSensorPosition();
         turretEncoderReadingVelocity = this.turretMotor.getSelectedSensorVelocity();
 
-        // SmartDashboard.putNumber("Shooter Encoder reading position", shooterEncoderReadingPosition);
+        SmartDashboard.putNumber("Shooter Encoder reading position", shooterEncoderReadingPosition);
         SmartDashboard.putNumber("Shooter Encoder Reading Velocity", shooterEncoderReadingVelocity);
         SmartDashboard.putNumber("Turret Encoder Reading Position", turretEncoderReadingPosition);
         SmartDashboard.putNumber("Turret Encoder Reading Velocity", turretEncoderReadingVelocity);
-        // SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
-        // SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
+        SmartDashboard.putNumber("Turret Hood Encoder reading Position", turretHoodPosition);
+        SmartDashboard.putNumber("Turret Hood Encoder Reading Velocity", turretHoodVelocity);
 
         switch (this.requestedPosition) {
             case FENDER:
@@ -198,23 +168,13 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 x = tx.getDouble(0.0);
                 y = ty.getDouble(0.0);
                 a = ta.getDouble(0.0);
-                // System.out.println(y);
                 totalAngle = a1+y;
-                // System.out.println(totalAngle);
                 totalAngleRadians = Math.toRadians(totalAngle);
-                // System.out.println("RAdians " + totalAngleRadians);
                 rs = Math.tan(totalAngleRadians);
                 totalDistance = heightDif / rs;
-                // System.out.println(totalDistance);
-                // System.out.println("Total dist" +  totalDistance);
-                // System.out.println("height sif" + heightDif);
-                // System.out.println("rs" + rs);
-                // System.out.println(totalDistance);
-                // setPointHood = getSetpointHood(totalDistance);
                 setPointHood = 0;
                 setPointShooterPID = getSetpointWheel(totalDistance);
                 setPointShooterPID = 0;
-                // System.out.println(setPointShooterPID);
                 break;
             case NONE:
                 centerUsingLimelight = false;
@@ -255,7 +215,6 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
                 turretReady = false;
             } else if(turretEncoderReadingPosition >= setPointRotation - turretBuffer && turretEncoderReadingPosition <= setPointRotation + turretBuffer){
                 turretMotor.set(ControlMode.PercentOutput, 0);
-        
                 turretReady = true;
             }else if(turretEncoderReadingPosition <= setPointRotation - turretBuffer){
                 turretMotor.set(ControlMode.PercentOutput, turretSpeed);
@@ -308,7 +267,6 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
         double absoluteWheelSpeed = Math.abs(shooterEncoderReadingVelocity);
         boolean spinningDown = setPointShooterPID == 0 && absoluteWheelSpeed > threshold;
         return spinningUp || spinningDown;
-        // return false;
     }
 
     @Override
