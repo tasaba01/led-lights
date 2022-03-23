@@ -17,6 +17,7 @@ import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
 import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import ca.team3161.lib.utils.Utils;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -64,6 +65,9 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
     private final double hoodSpeed = 0.5;
     private final double leftLimitLimelight = -1;
     private final double rightLimitLimelight = 1;
+
+
+   
 
     private final PIDController shooterPid;
     boolean centerUsingLimelight = false;
@@ -287,7 +291,21 @@ public class PIDShooterTrackingImpl extends RepeatingIndependentSubsystem implem
                 turretReady  = false;
             }
         }
+
+        Spark light = new Spark(9);
+              
+    //GREEN light
+        if(canSeeTarget == 1.0){
+         light.set(0.77);
+        }
+    //RED light
+        else if(canSeeTarget == 0.0){
+           light.set(0.61);
+        }
+ 
         
+        
+
         // setpoint for the shooter wheel
 
         if(setPointShooterPID != 0){

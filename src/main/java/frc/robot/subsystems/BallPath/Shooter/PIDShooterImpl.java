@@ -65,7 +65,7 @@ public class PIDShooterImpl extends RepeatingIndependentSubsystem implements Sho
     NetworkTableEntry targetSkew = table.getEntry("ts");
     double x, y, a, totalAngle, rs, totalDistance, totalAngleRadians;
 
-    double a1 = 35; // angle of limelight
+    double a1 = 35; // angle of limelight()
     double a2 = y;
     double h2 = 103; // HEIGHT OF TARGET
     double h1 = 35; // HEIGHT OF LIMELIGHT
